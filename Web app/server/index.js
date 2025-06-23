@@ -1,8 +1,12 @@
 require('dotenv').config();
 const express = require('express');
-const app = express();
-app.use(express.json());
 const cors = require('cors');
+const app = express();
+// Enable CORS
+app.use(cors({
+    origin: process.env.CLIENT_URL
+}));
+app.use(express.json());
 // Simple Route
 app.get("/", (req, res) => {
     res.send("Welcome to VHA.");
@@ -21,7 +25,3 @@ db.sequelize.sync({ alter: true })
     .catch((err) => {
         console.log(err);
     });
-// Enable CORS
-app.use(cors({
-    origin: process.env.CLIENT_URL
-}));
