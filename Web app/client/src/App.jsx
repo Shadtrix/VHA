@@ -3,6 +3,7 @@ import { Container, AppBar, Toolbar, Typography } from '@mui/material';
 import { BrowserRouter as Router, Routes, Route, Link }
   from 'react-router-dom';
 import Tutorials from './pages/Tutorials';
+import Rating from './pages/Rating';
 function App() {
   return (
     <Router>
@@ -15,6 +16,7 @@ function App() {
               </Typography>
             </Link>
             <Link to="/tutorials" ><Typography>Tutorials</Typography></Link>
+            <Link to="/rating"><Typography>Rating</Typography></Link>
           </Toolbar>
         </Container>
       </AppBar>
@@ -22,6 +24,7 @@ function App() {
         <Routes>
           <Route path={"/"} element={<Tutorials />} />
           <Route path={"/tutorials"} element={<Tutorials />} />
+          <Route path="/rating" element={<Rating />} />
         </Routes>
       </Container>
     </Router>
