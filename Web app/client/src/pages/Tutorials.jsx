@@ -17,7 +17,7 @@ function Tutorials() {
     return (
         <Box>
             <Typography variant="h5" sx={{ my: 2 }}>
-                Tutorials
+                Reviews
             </Typography>
             <Grid container spacing={2}>
                 {
