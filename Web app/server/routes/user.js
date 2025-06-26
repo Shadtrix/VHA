@@ -33,12 +33,10 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Email already exists." });
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-
     const newUser = await User.create({
       name: data.name,
       email: data.email,
-      password: hashedPassword,
+      password: data.password,
       role
     });
 
@@ -101,5 +99,17 @@ router.get("/auth", validateToken, (req, res) => {
   };
   res.json({ user: userInfo });
 });
+router.get("/all", async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ['id', 'name', 'email', 'role', 'createdAt', 'password'] 
+    });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+});
+
+
 
 module.exports = router;
