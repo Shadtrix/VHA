@@ -46,10 +46,10 @@ function AppContent() {
             </Link>
             <Button color="inherit" onClick={handleOpenMenu}>Services</Button>
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-              <MenuItem onClick={handleCloseMenu} component={Link} to="/service1">MEP Engineering</MenuItem>
-              <MenuItem onClick={handleCloseMenu} component={Link} to="/service2">Fire Safety Engineering</MenuItem>
-              <MenuItem onClick={handleCloseMenu} component={Link} to="/service3">Annual Fire Certification</MenuItem>
-              <MenuItem onClick={handleCloseMenu} component={Link} to="/service4">Registered Inspector Services</MenuItem>
+              <MenuItem onClick={handleCloseMenu} component={Link} to="/mechanicalelectricalplumbing">MEP Engineering</MenuItem>
+              <MenuItem onClick={handleCloseMenu} component={Link} to="/firesafetyengineering">Fire Safety Engineering</MenuItem>
+              <MenuItem onClick={handleCloseMenu} component={Link} to="/annualfirecertification">Annual Fire Certification</MenuItem>
+              <MenuItem onClick={handleCloseMenu} component={Link} to="/registeredinspectorservices">Registered Inspector Services</MenuItem>
             </Menu>
           </Box>
 
@@ -85,6 +85,12 @@ function AppContent() {
             <Route path="/rating" element={<Rating />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/registeredinspectorservices" element={<RegisteredInspectorServices />} />
+            <Route path="/admin/reviews" element={<ReviewAdmin />} />
+            <Route path="/submit-review" element={<ReviewForm />} />
+            <Route path="/annualfirecertification" element={<AnnualFireCertification />} />
+            <Route path="/firesafetyengineering" element={<FireSafetyEngineering />} />
+            <Route path="/mechanicalelectricalplumbing" element={<MechanicalElectricalPlumbing />} />
           </Routes>
         </Container>
       </Box>
