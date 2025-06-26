@@ -3,6 +3,7 @@
   flex-direction: row;
   gap: 0.25rem;
 }
+
 .star {
   font-size: 2rem;
   color: #ccc;
@@ -10,12 +11,16 @@
   transition: color 0.2s ease;
 }
 
+/* Filled stars (based on value or hover) */
 .star.filled {
-  color: #facc15;
+  color: #facc15; /* Yellow-400 */
 }
-.star.star.hovered {
-  color: #f59e0b;
+
+/* Hover effect only (darker yellow) */
+.star.hovered {
+  color: #f59e0b; /* Yellow-500 */
 }
+
 input[type="radio"] {
   display: none;
 }

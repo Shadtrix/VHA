@@ -11,23 +11,23 @@ const ReviewAdmin = () => {
   }, []);
 
   const fetchReviews = async () => {
-  try {
-    const res = await axios.get("/api/reviews");
-    if (Array.isArray(res.data)) {
-      setReviews(res.data);
-    } else {
-      console.error("Expected array, got:", res.data);
-      setReviews([]); // fallback
+    try {
+      const res = await axios.get("http://localhost:3001/api/reviews");
+      if (Array.isArray(res.data)) {
+        setReviews(res.data);
+      } else {
+        console.error("Expected array, got:", res.data);
+        setReviews([]); // fallback
+      }
+    } catch (err) {
+      console.error("Failed to fetch reviews:", err);
+      setReviews([]); // fallback on error
     }
-  } catch (err) {
-    console.error("Failed to fetch reviews:", err);
-    setReviews([]); // fallback on error
-  }
-};
+  };
 
 
   const handleDelete = async (id) => {
-    await axios.delete(`/api/reviews/${id}`);
+    await axios.delete(`http://localhost:3001/api/reviews/${id}`);
     fetchReviews(); // refresh list
   };
 
@@ -36,13 +36,13 @@ const ReviewAdmin = () => {
   );
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Review Management (Admin)</h1>
+    <div className="review-admin-container">
+      <h1 className="review-admin-title">Review Management (Admin)</h1>
 
-      <div className="mb-4">
-        <label className="font-medium mr-2">Filter by service:</label>
+      <div className="review-admin-filter">
+        <label>Filter by service:</label>
         <select
-          className="border p-2"
+          className="review-admin-select"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
@@ -54,19 +54,24 @@ const ReviewAdmin = () => {
         </select>
       </div>
 
-      <div className="space-y-4">
+      <div className="review-admin-list">
         {filteredReviews.length > 0 ? (
           filteredReviews.map((review) => (
-            <div
-              key={review.id}
-              className="border rounded p-4 bg-gray-100 flex justify-between items-start"
-            >
+            <div key={review.id} className="review-admin-item">
               <div>
-                <p className="font-bold">{review.name} <span className="text-sm text-gray-500">({review.service})</span></p>
-                <p className="text-gray-700 mt-1">{review.description}</p>
+                <p className="review-admin-name">
+                  {review.name} <span className="review-admin-service">({review.service})</span>
+                </p>
+                <p className="review-admin-company">
+                  {review.company || "N/A"}
+                </p>
+                <p className="review-admin-rating">
+                  Rating: {review.rating} <span className="review-admin-stars">★</span>
+                </p>
+                <p className="review-admin-description">{review.description}</p>
               </div>
               <button
-                className="ml-4 text-red-500 hover:underline"
+                className="review-admin-delete-btn"
                 onClick={() => handleDelete(review.id)}
               >
                 Delete
@@ -78,6 +83,7 @@ const ReviewAdmin = () => {
         )}
       </div>
     </div>
+
   );
 };
 

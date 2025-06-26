@@ -4,7 +4,7 @@ import StarRating from "../components/StarRating";
 import "./ReviewForm.css";
 
 const ReviewForm = ({ onAdd = () => {} }) => {
-  const [formData, setFormData] = useState({ name: "", description: "", service: "MEP Engineering" });
+  const [formData, setFormData] = useState({ name: "", company: "", description: "", service: "MEP Engineering" });
   const [rating, setRating] = useState(3);
 
   const handleChange = (e) => {
@@ -15,9 +15,9 @@ const ReviewForm = ({ onAdd = () => {} }) => {
     e.preventDefault();
     const dataToSend = { ...formData, rating };
     try {
-      const res = await axios.post("/api/reviews", dataToSend);
+      const res = await axios.post("http://localhost:3001/api/reviews", dataToSend);
       onAdd(res.data);
-      setFormData({ name: "", description: "", service: "MEP Engineering" });
+      setFormData({ name: "", company: "", description: "", service: "MEP Engineering" });
       setRating(3);
     } catch (error) {
       console.error("Error submitting review:", error);
@@ -40,12 +40,12 @@ const ReviewForm = ({ onAdd = () => {} }) => {
         required
       />
 
-      <label htmlFor="rep">Your Company Representation</label>
+      <label htmlFor="company">Your Company Representation</label>
       <input
-        id="rep"
-        name="rep"
+        id="company"
+        name="company"
         type="text"
-        value={formData.rep}
+        value={formData.company}
         onChange={handleChange}
         placeholder="Your company representation"
         required

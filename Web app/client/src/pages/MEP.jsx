@@ -1,27 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
+import axios from "axios";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import "./carousel.css";
 
 const MechanicalElectricalPlumbing = () => {
-    const reviews = [
-        {
-            name: "Mr. Tan",
-            text: "Professional service and thorough inspection. Highly recommended!",
-        },
-        {
-            name: "Ms. Lim",
-            text: "Quick response and helpful communication throughout the certification process.",
-        },
-        {
-            name: "Building Corp Pte Ltd",
-            text: "Their team is highly knowledgeable in fire safety compliance. We passed FSC smoothly!",
-        },
-    ];
+    const [reviews, setReviews] = useState([]);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const res = await axios.get("http://localhost:3001/api/reviews");
+                const filtered = res.data
+                    .filter(
+                        (review) =>
+                            review.service === "MEP Engineering" && review.rating === 5
+                    )
+                    .slice(0, 3); // Limit to 3
+                setReviews(filtered);
+            } catch (error) {
+                console.error("Failed to fetch reviews:", error);
+            }
+        };
+
+        fetchReviews();
+    }, []);
 
     const sliderSettings = {
         dots: true,
-        infinite: true,
+        infinite: reviews.length > 1,
         speed: 500,
         autoplay: true,
         autoplaySpeed: 3000,
@@ -31,21 +39,39 @@ const MechanicalElectricalPlumbing = () => {
 
     return (
         <div className="max-w-4xl mx-auto p-6 space-y-8">
-            <section className="mt-10">
-                <h2 className="text-2xl font-semibold mb-4">Customer Reviews</h2>
-                <Slider {...sliderSettings}>
-                    {reviews.map((review, index) => (
-                        <div key={index} className="p-4 bg-gray-100 rounded shadow">
-                            <p className="italic">"{review.text}"</p>
-                            <p className="mt-2 font-semibold text-right">— {review.name}</p>
-                        </div>
-                    ))}
-                </Slider>
+            <section className="customer-reviews-section">
+                <h2 className="customer-reviews-title">Customer Reviews</h2>
+                {reviews.length > 0 ? (
+                    <div className="carousel-wrapper">
+                        <Slider {...sliderSettings}>
+                            {reviews.map((review, index) => (
+                                <div key={index} className="p-4 bg-gray-100 rounded shadow">
+                                    <p className="italic">"{review.description}"</p>
+                                    <p className="mt-2 font-semibold text-right">
+                                        By {review.name}
+                                        {review.company ? ` from ${review.company}` : ""}
+                                    </p>
+                                </div>
+                            ))}
+                        </Slider>
+                    </div>
+                ) : (
+                    <p>No 5-star reviews available yet.</p>
+                )}
+
             </section>
+
+
             <section>
                 <h1 className="text-3xl font-bold mb-4">MEP Engineering</h1>
                 <p>
-                    Our Mechanical, Electrical, and Plumbing (MEP) Engineering services encompass a wide spectrum of building systems. We offer comprehensive design, inspection, and certification services across a variety of sectors including infrastructural, commercial, industrial, institutional, and residential developments. Our experienced team ensures all MEP systems meet the required codes and standards for safe and efficient operations.
+                    Our Mechanical, Electrical, and Plumbing (MEP) Engineering services
+                    encompass a wide spectrum of building systems. We offer comprehensive
+                    design, inspection, and certification services across a variety of
+                    sectors including infrastructural, commercial, industrial,
+                    institutional, and residential developments. Our experienced team
+                    ensures all MEP systems meet the required codes and standards for
+                    safe and efficient operations.
                 </p>
             </section>
 
