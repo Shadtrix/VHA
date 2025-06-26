@@ -25,3 +25,6 @@ db.sequelize.sync({ alter: true })
     .catch((err) => {
         console.log(err);
     });
+
+const userRoute = require('./routes/user');
+app.use("/user", userRoute);
