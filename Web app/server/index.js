@@ -3,39 +3,39 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// Enable CORS
+// Enable CORS for frontend
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // fallback
+  origin: process.env.CLIENT_URL || "http://localhost:5173"
 }));
 
-// Middleware to parse JSON
+// Middleware to parse incoming JSON
 app.use(express.json());
 
-// Simple welcome route
+// Simple base route
 app.get("/", (req, res) => {
-    res.send("Welcome to VHA.");
+  res.send("Welcome to VHA.");
 });
 
-// Routes
+// API Routes
 const tutorialRoute = require('./routes/tutorial');
 app.use("/tutorial", tutorialRoute);
 
 const userRoute = require('./routes/user');
 app.use("/user", userRoute);
 
-// ✅ Review routes
 const reviewRoutes = require("./routes/reviews");
-app.use("/api/reviews", reviewRoutes); // Must come AFTER express.json()
+app.use("/api/reviews", reviewRoutes);
 
-// DB connection
+// Sequelize DB Connection
 const db = require('./models');
-db.sequelize.sync({ alter: true }) // or use { force: false } in production
-    .then(() => {
-        const port = process.env.APP_PORT || 8080;
-        app.listen(port, () => {
-            console.log(`Server running on http://localhost:${port}`);
-        });
-    })
-    .catch((err) => {
-        console.error("Failed to sync database:", err);
+
+db.sequelize.sync({ alter: true }) // use { force: false } in production
+  .then(() => {
+    const port = process.env.APP_PORT || 8080;
+    app.listen(port, () => {
+      console.log(` Server running at: http://localhost:${port}`);
     });
+  })
+  .catch((err) => {
+    console.error(" Failed to sync database:", err);
+  });
