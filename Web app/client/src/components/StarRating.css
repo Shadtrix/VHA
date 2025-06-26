@@ -1,0 +1,26 @@
+.star-rating {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+}
+
+.star {
+  font-size: 2rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+/* Filled stars (based on value or hover) */
+.star.filled {
+  color: #facc15; /* Yellow-400 */
+}
+
+/* Hover effect only (darker yellow) */
+.star.hovered {
+  color: #f59e0b; /* Yellow-500 */
+}
+
+input[type="radio"] {
+  display: none;
+}
