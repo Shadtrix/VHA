@@ -1,7 +1,14 @@
 {
+  "type": "module",
   "dependencies": {
     "mysql2": "^3.14.1",
     "sequelize": "^6.37.7",
     "yup": "^1.6.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.10"
   }
 }

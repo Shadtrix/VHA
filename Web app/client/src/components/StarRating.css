@@ -1,0 +1,21 @@
+.star-rating {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
+}
+.star {
+  font-size: 2rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.star.filled {
+  color: #facc15;
+}
+.star.star.hovered {
+  color: #f59e0b;
+}
+input[type="radio"] {
+  display: none;
+}

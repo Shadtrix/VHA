@@ -5,8 +5,18 @@ import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Tutorials from './pages/Tutorials';
 import Rating from './pages/Rating';
+<<<<<<< Updated upstream
 import Register from './pages/Register';
 import Login from './pages/Login';
+=======
+import RIS from './pages/RIS';
+import RegisteredInspectorServices from './pages/RIS';
+import ReviewAdmin from "./pages/ReviewAdmin";
+import ReviewForm from "./pages/ReviewForm";
+import AnnualFireCertification from "./pages/AFC";
+import FireSafetyEngineering from "./pages/FSE";
+import MechanicalElectricalPlumbing from './pages/MEP';
+>>>>>>> Stashed changes
 
 function App() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -57,6 +67,7 @@ function App() {
           </Box>
         </Toolbar>
       </AppBar>
+<<<<<<< Updated upstream
 
       <Box sx={{ mt: '64px' }}>
         <Container>
@@ -69,6 +80,21 @@ function App() {
           </Routes>
         </Container>
       </Box>
+=======
+      <Container>
+        <Routes>
+          <Route path={"/"} element={<Tutorials />} />
+          <Route path={"/tutorials"} element={<Tutorials />} />
+          <Route path="/rating" element={<Rating />} />
+          <Route path="/registeredinspectorservices" element={<RegisteredInspectorServices />} />
+          <Route path="/admin/reviews" element={<ReviewAdmin />} />
+          <Route path="/submit-review" element={<ReviewForm />} />
+          <Route path="/annualfirecertification" element={<AnnualFireCertification />} />
+          <Route path="/firesafetyengineering" element={<FireSafetyEngineering />} />
+          <Route path="/mechanicalelectricalplumbing" element={<MechanicalElectricalPlumbing />} />
+        </Routes>
+      </Container>
+>>>>>>> Stashed changes
     </Router>
   );
 }

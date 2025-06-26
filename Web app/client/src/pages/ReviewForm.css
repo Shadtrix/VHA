@@ -1,0 +1,74 @@
+
+
+.review-form {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #f9fafb; /* Tailwind gray-50 */
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+  font-family: 'Inter', sans-serif;
+}
+
+.review-form h {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #111827; /* gray-900 */
+}
+
+.review-form input[type="text"],
+.review-form textarea,
+.review-form select {
+  width: 100%;
+  padding: 1rem 1.2;
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 0.375rem;
+  font-size: 1.2rem;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+  margin-bottom: 1.2rem;
+}
+
+.review-form textarea {
+  resize: none;
+  min-height: 120px;
+}
+
+.review-form input[type="text"]:focus,
+.review-form textarea:focus,
+.review-form select:focus {
+  outline: none;
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.3);
+}
+
+.review-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #374151; /* gray-700 */
+}
+
+.review-form button[type="submit"] {
+  background-color: #2563eb; /* blue-600 */
+  color: white;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 1rem;
+}
+
+.review-form button[type="submit"]:hover {
+  background-color: #1d4ed8; /* blue-700 */
+}
+
+/* Add some spacing above star rating container */
+.review-form .star-rating-container {
+  margin-bottom: 1rem;
+}
