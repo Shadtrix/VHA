@@ -13,6 +13,7 @@ import ReviewForm from './pages/ReviewForm';
 import AnnualFireCertification from './pages/AnnualFireCertification';
 import FireSafetyEngineering from './pages/FireSafetyEngineering';
 import MechanicalElectricalPlumbing from './pages/MechanicalElectricalPlumbing';
+import Admin from './pages/Admin';
 
 import UserContext from './contexts/UserContext';
 import { ToastContainer, toast } from 'react-toastify';
@@ -58,6 +59,9 @@ function AppContent() {
               <MenuItem onClick={handleCloseMenu} component={Link} to="/annualfirecertification">Annual Fire Certification</MenuItem>
               <MenuItem onClick={handleCloseMenu} component={Link} to="/registeredinspectorservices">Registered Inspector Services</MenuItem>
             </Menu>
+            <Link to="/admin" style={{ textDecoration: 'none', color: 'white' }}>
+              <Typography>Admin</Typography>
+            </Link>
           </Box>
 
           <Box>
@@ -98,6 +102,7 @@ function AppContent() {
             <Route path="/annualfirecertification" element={<AnnualFireCertification />} />
             <Route path="/firesafetyengineering" element={<FireSafetyEngineering />} />
             <Route path="/mechanicalelectricalplumbing" element={<MechanicalElectricalPlumbing />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </Container>
       </Box>
