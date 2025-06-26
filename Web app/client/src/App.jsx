@@ -7,6 +7,13 @@ import Tutorials from './pages/Tutorials';
 import Rating from './pages/Rating';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import RegisteredInspectorServices from './pages/RegisteredInspectorServices';
+import ReviewAdmin from './pages/ReviewAdmin';
+import ReviewForm from './pages/ReviewForm';
+import AnnualFireCertification from './pages/AnnualFireCertification';
+import FireSafetyEngineering from './pages/FireSafetyEngineering';
+import MechanicalElectricalPlumbing from './pages/MechanicalElectricalPlumbing';
+
 import UserContext from './contexts/UserContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
