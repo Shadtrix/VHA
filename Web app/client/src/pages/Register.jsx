@@ -152,7 +152,7 @@ function Register() {
                 textAlign: 'center'
             }}>
                 <img
-                    src="/src/public/b7c91e06-f9f9-4ff9-930f-2ab320d5b8d2.png"
+                    src="/src/public/"
                     alt="Signup Illustration"
                     style={{
                         maxWidth: '100%',

@@ -1,24 +1,37 @@
 import './App.css';
 import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Box, Container } from '@mui/material';
 import { AccountCircle, ArrowDropDown } from '@mui/icons-material';
-import { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Tutorials from './pages/Tutorials';
 import Rating from './pages/Rating';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import UserContext from './contexts/UserContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-function App() {
+function AppContent() {
+  const { user, setUser } = useContext(UserContext);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [accountMenuEl, setAccountMenuEl] = useState(null);
+
   const handleOpenMenu = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
 
-  const [accountMenuEl, setAccountMenuEl] = useState(null);
   const handleAccountMenuOpen = (event) => setAccountMenuEl(event.currentTarget);
   const handleAccountMenuClose = () => setAccountMenuEl(null);
 
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    setUser(null);
+    toast.success('Logged out successfully');
+    window.location.href = '/login';
+  };
+
   return (
-    <Router>
+    <>
       <AppBar position="fixed" className="AppBar">
         <Toolbar disableGutters sx={{ justifyContent: 'space-between', px: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -48,11 +61,17 @@ function App() {
               startIcon={<AccountCircle />}
               sx={{ textTransform: 'none', fontWeight: 'bold' }}
             >
-              Account
+              {user ? user.name : 'Account'}
             </Button>
             <Menu anchorEl={accountMenuEl} open={Boolean(accountMenuEl)} onClose={handleAccountMenuClose}>
-              <MenuItem onClick={handleAccountMenuClose} component={Link} to="/register">Register</MenuItem>
-              <MenuItem onClick={handleAccountMenuClose} component={Link} to="/login">Login</MenuItem>
+              {!user ? (
+                <>
+                  <MenuItem onClick={handleAccountMenuClose} component={Link} to="/register">Register</MenuItem>
+                  <MenuItem onClick={handleAccountMenuClose} component={Link} to="/login">Login</MenuItem>
+                </>
+              ) : (
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              )}
             </Menu>
           </Box>
         </Toolbar>
@@ -69,6 +88,16 @@ function App() {
           </Routes>
         </Container>
       </Box>
+
+      <ToastContainer />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
