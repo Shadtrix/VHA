@@ -66,10 +66,9 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: errorMsg });
     }
 
-    const match = await bcrypt.compare(data.password, user.password);
-    if (!match) {
-      return res.status(400).json({ message: errorMsg });
-    }
+    if (data.password !== user.password) {
+  return res.status(400).json({ message: errorMsg });
+}
 
     // Include role in userInfo
     const userInfo = {
