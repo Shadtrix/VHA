@@ -67,9 +67,9 @@ router.post("/login", async (req, res) => {
     }
 
     if (data.password !== user.password) {
-  return res.status(400).json({ message: errorMsg });
-}
-
+      return res.status(400).json({ message: errorMsg });
+    }
+    
     // Include role in userInfo
     const userInfo = {
       id: user.id,
