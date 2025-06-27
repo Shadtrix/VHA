@@ -1,46 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Container,
-  Typography,
-  List,
-  ListItem,
-  ListItemIcon,
-  Divider,
-  Box,
-  Paper,
+  Container, Typography, List, ListItem, ListItemIcon, Box, Paper, CircularProgress,
 } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
 import { useNavigate } from 'react-router-dom';
-
-const inboxData = [
-  {
-    id: 1,
-    sender: "NYP_Bursary",
-    subject: "Final Reminder AY2025 Gov Bursary App",
-    date: "April 15",
-  },
-  {
-    id: 2,
-    sender: "NYP_Admissions_me",
-    subject: "Final Reminder AY2025 Gov Bursary App",
-    date: "April 15",
-  },
-  {
-    id: 3,
-    sender: "NYP_Admissions",
-    subject: "AY2025 Admissions Bursary Application is Open",
-    date: "April 4",
-  },
-  {
-    id: 4,
-    sender: "NYP Bursary",
-    subject: "Singapore Bursary Scheme – Now Open",
-    date: "March 22",
-  },
-];
+import axios from 'axios';
 
 function AdminInbox() {
+  const [inboxData, setInboxData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/api/email')  // Your backend API URL
+      .then((res) => {
+        setInboxData(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed to load emails:', err);
+        setLoading(false);
+      });
+  }, []);
 
   const handleClick = (id) => {
     navigate(`/email/${id}`);
@@ -58,7 +40,6 @@ function AdminInbox() {
       }}
     >
       <Container maxWidth="md">
-        {/* Header row */}
         <Box
           sx={{
             backgroundColor: 'black',
@@ -79,11 +60,15 @@ function AdminInbox() {
           <Box sx={{ flex: 2, textAlign: 'center' }}>Date</Box>
         </Box>
 
-        {/* Inbox List */}
-        <List>
-          {inboxData.map((email) => (
-            <React.Fragment key={email.id}>
+        {loading ? (
+          <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <List>
+            {inboxData.map((email) => (
               <Paper
+                key={email.id}
                 elevation={1}
                 sx={{
                   mb: 0.5,
@@ -115,9 +100,9 @@ function AdminInbox() {
                   </Box>
                 </ListItem>
               </Paper>
-            </React.Fragment>
-          ))}
-        </List>
+            ))}
+          </List>
+        )}
       </Container>
     </Box>
   );
