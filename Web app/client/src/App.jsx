@@ -16,6 +16,8 @@ import MechanicalElectricalPlumbing from './pages/MechanicalElectricalPlumbing';
 import Admin from './pages/Admin';
 import AdminLogin from './pages/Adminlog';
 import AdminSignUp from './pages/Adminsign';
+import AdminInbox from './pages/AdminInbox';
+import EmailContent from './pages/EmailContent';
 
 import UserContext from './contexts/UserContext';
 import { ToastContainer, toast } from 'react-toastify';
@@ -103,6 +105,8 @@ function AppContent() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/Inbox" element={<AdminInbox />} />
+            <Route path="/email/:id" element={<EmailContent />} />
             <Route path="/admin/register" element={<AdminSignUp />} />
             <Route path="/registeredinspectorservices" element={<RegisteredInspectorServices />} />
             <Route path="/admin/reviews" element={<ReviewAdmin />} />
