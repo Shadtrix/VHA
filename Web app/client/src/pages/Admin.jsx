@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Button, Typography, Paper,
-  Table, TableHead, TableRow, TableCell, TableBody, IconButton
+  Box, Button, Typography, Paper, TextField, IconButton,
+  Table, TableHead, TableRow, TableCell, TableBody,
+  Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Edit } from '@mui/icons-material';
 import http from '../http';
 
 function Admin() {
@@ -11,13 +12,89 @@ function Admin() {
   const [users, setUsers] = useState([]);
   const [visiblePasswords, setVisiblePasswords] = useState({});
 
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
+  const [sender, setSender] = useState('');
+  const [category, setCategory] = useState([]);
+
+  const [categories, setCategories] = useState([]);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [editedName, setEditedName] = useState('');
+
   useEffect(() => {
     if (activeSection === 'Users') {
       http.get('/user/all')
         .then((res) => setUsers(res.data))
         .catch((err) => console.error('Failed to load users', err));
+    } else if (activeSection === 'Email Filters') {
+      fetchCategories();
     }
   }, [activeSection]);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await http.get('/categories');
+      setCategories(res.data);
+    } catch (err) {
+      console.error('Failed to load categories', err);
+    }
+  };
+
+  const categorize = () => {
+    const keywords = {
+      Bursary: ["bursary", "financial aid", "gov bursary"],
+      Admissions: ["admission", "open house", "apply"],
+      Enrolment: ["enrol", "register", "matriculation"],
+      Deadline: ["deadline", "reminder", "final date"],
+      NYP: ["nyp"],
+      Orientation: ["orientation", "welcome"],
+      Scholarship: ["scholarship", "merit"],
+      Payment: ["payment", "fee", "invoice"]
+    };
+
+    const text = `${subject} ${body}`.toLowerCase();
+    const matched = [];
+
+    for (const [cat, words] of Object.entries(keywords)) {
+      if (words.some(w => text.includes(w))) {
+        matched.push(cat);
+      }
+    }
+
+    setCategory(matched);
+  };
+
+  const saveEmail = async () => {
+    try {
+      const res = await http.post('/emails', { sender, subject, body });
+      alert(`Saved! Categories: ${res.data.categories.join(', ')}`);
+      setSender('');
+      setSubject('');
+      setBody('');
+      setCategory([]);
+    } catch (err) {
+      alert('Failed to save email.');
+      console.error(err);
+    }
+  };
+
+  const openEditDialog = (cat) => {
+    setSelectedCategory(cat);
+    setEditedName(cat.name);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditSave = async () => {
+    try {
+      await http.put(`/categories/${selectedCategory.id}`, { name: editedName });
+      setEditDialogOpen(false);
+      fetchCategories();
+    } catch (err) {
+      alert('Failed to update category.');
+      console.error(err);
+    }
+  };
 
   const togglePassword = (id) => {
     setVisiblePasswords((prev) => ({
@@ -83,6 +160,91 @@ function Admin() {
         return <Typography variant="h5">Reports</Typography>;
       case 'Settings':
         return <Typography variant="h5">Settings</Typography>;
+      case 'Email Filters':
+        return (
+          <Box>
+            <Typography variant="h5" mb={2}>Email Categorizer</Typography>
+
+            <TextField fullWidth label="Sender" value={sender} onChange={e => setSender(e.target.value)} sx={{ mb: 2 }} />
+            <TextField fullWidth label="Subject" value={subject} onChange={e => setSubject(e.target.value)} sx={{ mb: 2 }} />
+            <TextField fullWidth multiline rows={4} label="Body" value={body} onChange={e => setBody(e.target.value)} sx={{ mb: 2 }} />
+
+            <Button variant="contained" onClick={categorize}>Categorize</Button>
+            <Button variant="outlined" sx={{ ml: 2 }} onClick={saveEmail}>Save Email</Button>
+
+            <Box mt={2}>
+              <Typography variant="subtitle1">Matched Categories:</Typography>
+              {category.length > 0 ? (
+                <ul>{category.map((c, i) => <li key={i}>{c}</li>)}</ul>
+              ) : (
+                <Typography>No categories matched.</Typography>
+              )}
+            </Box>
+
+            <Box mt={4}>
+              <Typography variant="h6" gutterBottom>Manage Categories</Typography>
+
+              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <TextField
+                  label="New Category Name"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                />
+                <Button variant="contained" onClick={async () => {
+                  try {
+                    await http.post('/categories', { name: editedName });
+                    setEditedName('');
+                    fetchCategories();
+                  } catch {
+                    alert('Failed to add category');
+                  }
+                }}>Add</Button>
+              </Box>
+
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {categories.map(cat => (
+                    <TableRow key={cat.id}>
+                      <TableCell>{cat.id}</TableCell>
+                      <TableCell>{cat.name}</TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => openEditDialog(cat)}><Edit /></IconButton>
+                        <IconButton onClick={async () => {
+                          if (window.confirm('Delete this category?')) {
+                            try {
+                              await http.delete(`/categories/${cat.id}`);
+                              fetchCategories();
+                            } catch {
+                              alert('Failed to delete');
+                            }
+                          }
+                        }}><VisibilityOff /></IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+
+            <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+              <DialogTitle>Edit Category</DialogTitle>
+              <DialogContent>
+                <TextField fullWidth value={editedName} onChange={e => setEditedName(e.target.value)} />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleEditSave} variant="contained">Save</Button>
+              </DialogActions>
+            </Dialog>
+          </Box>
+        );
       default:
         return null;
     }
@@ -91,24 +253,14 @@ function Admin() {
   return (
     <Box sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <Button variant={activeSection === 'Dashboard' ? 'contained' : 'outlined'}
-          onClick={() => setActiveSection('Dashboard')}>
-          Dashboard
-        </Button>
-        <Button variant={activeSection === 'Users' ? 'contained' : 'outlined'}
-          onClick={() => setActiveSection('Users')}>
-          Users
-        </Button>
-        <Button variant={activeSection === 'Reports' ? 'contained' : 'outlined'}
-          onClick={() => setActiveSection('Reports')}>
-          Reports
-        </Button>
-        <Button variant={activeSection === 'Settings' ? 'contained' : 'outlined'}
-          onClick={() => setActiveSection('Settings')}>
-          Settings
-        </Button>
+        {['Dashboard', 'Users', 'Reports', 'Settings', 'Email Filters'].map(section => (
+          <Button key={section}
+            variant={activeSection === section ? 'contained' : 'outlined'}
+            onClick={() => setActiveSection(section)}>
+            {section}
+          </Button>
+        ))}
       </Box>
-
       <Paper elevation={3} sx={{ p: 3 }}>
         {renderSection()}
       </Paper>

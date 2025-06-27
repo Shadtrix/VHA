@@ -39,3 +39,6 @@ db.sequelize.sync({ alter: true }) // use { force: false } in production
   .catch((err) => {
     console.error(" Failed to sync database:", err);
   });
+
+const categoryRoutes = require('./routes/categories');
+app.use('/categories', categoryRoutes);
