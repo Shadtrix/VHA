@@ -163,26 +163,8 @@ function Admin() {
       case 'Email Filters':
         return (
           <Box>
-            <Typography variant="h5" mb={2}>Email Categorizer</Typography>
-
-            <TextField fullWidth label="Sender" value={sender} onChange={e => setSender(e.target.value)} sx={{ mb: 2 }} />
-            <TextField fullWidth label="Subject" value={subject} onChange={e => setSubject(e.target.value)} sx={{ mb: 2 }} />
-            <TextField fullWidth multiline rows={4} label="Body" value={body} onChange={e => setBody(e.target.value)} sx={{ mb: 2 }} />
-
-            <Button variant="contained" onClick={categorize}>Categorize</Button>
-            <Button variant="outlined" sx={{ ml: 2 }} onClick={saveEmail}>Save Email</Button>
-
-            <Box mt={2}>
-              <Typography variant="subtitle1">Matched Categories:</Typography>
-              {category.length > 0 ? (
-                <ul>{category.map((c, i) => <li key={i}>{c}</li>)}</ul>
-              ) : (
-                <Typography>No categories matched.</Typography>
-              )}
-            </Box>
-
-            <Box mt={4}>
-              <Typography variant="h6" gutterBottom>Manage Categories</Typography>
+            <Box>
+              <Typography variant="h5" mb={2}>Manage Categories</Typography>
 
               <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                 <TextField
