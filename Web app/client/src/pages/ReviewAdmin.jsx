@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./ReviewAdmin.css"; // Assuming you have some styles for this component
+import "./ReviewAdmin.css";
 
 const ReviewAdmin = () => {
   const [reviews, setReviews] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    company: "",
+    description: "",
+    service: "",
+    rating: 5
+  });
 
   useEffect(() => {
     fetchReviews();
@@ -15,24 +23,61 @@ const ReviewAdmin = () => {
       const res = await axios.get("http://localhost:3001/api/reviews");
       if (Array.isArray(res.data)) {
         setReviews(res.data);
-      } else {
-        console.error("Expected array, got:", res.data);
-        setReviews([]); // fallback
       }
     } catch (err) {
       console.error("Failed to fetch reviews:", err);
-      setReviews([]); // fallback on error
+    }
+  };
+
+  const handleDelete = async (id) => {
+    await axios.delete(`http://localhost:3001/api/reviews/${id}`);
+    fetchReviews();
+  };
+
+  const handleEditClick = (review) => {
+    setEditingReviewId(review.id);
+    setEditForm({
+      name: review.name,
+      company: review.company,
+      description: review.description,
+      service: review.service,
+      rating: review.rating
+    });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      await axios.patch(`http://localhost:3001/api/reviews/${editingReviewId}`, editForm);
+      setEditingReviewId(null);
+      fetchReviews();
+    } catch (err) {
+      console.error("Failed to update review:", err);
+    }
+  };
+
+  const handleToggleFeatured = async (id, newValue) => {
+    console.log(`Toggling featured for id=${id} to ${newValue}`);
+
+    setReviews(prev =>
+      prev.map(r => (r.id === id ? { ...r, featured: newValue } : r))
+    );
+
+    try {
+      await axios.patch(`http://localhost:3001/api/reviews/${id}`, { featured: newValue });
+      fetchReviews();
+    } catch (err) {
+      console.error("Failed to update review:", err);
     }
   };
 
 
-  const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:3001/api/reviews/${id}`);
-    fetchReviews(); // refresh list
-  };
-
-  const filteredReviews = reviews.filter((review) =>
-    filter === "All" ? true : review.service === filter
+  const filteredReviews = reviews.filter((r) =>
+    filter === "All" ? true : r.service === filter
   );
 
   return (
@@ -58,32 +103,79 @@ const ReviewAdmin = () => {
         {filteredReviews.length > 0 ? (
           filteredReviews.map((review) => (
             <div key={review.id} className="review-admin-item">
-              <div>
-                <p className="review-admin-name">
-                  {review.name} <span className="review-admin-service">({review.service})</span>
-                </p>
-                <p className="review-admin-company">
-                  {review.company || "N/A"}
-                </p>
-                <p className="review-admin-rating">
-                  Rating: {review.rating} <span className="review-admin-stars">★</span>
-                </p>
-                <p className="review-admin-description">{review.description}</p>
+              {editingReviewId === review.id ? (
+                <div className="review-edit-form">
+                  <input
+                    type="text"
+                    name="name"
+                    value={editForm.name}
+                    onChange={handleEditChange}
+                    placeholder="Name"
+                  />
+                  <input
+                    type="text"
+                    name="company"
+                    value={editForm.company}
+                    onChange={handleEditChange}
+                    placeholder="Company"
+                  />
+                  <textarea
+                    name="description"
+                    value={editForm.description}
+                    onChange={handleEditChange}
+                    placeholder="Description"
+                  />
+                  <select name="service" value={editForm.service} onChange={handleEditChange}>
+                    <option>MEP Engineering</option>
+                    <option>Fire Safety Engineering</option>
+                    <option>Annual Fire Certification</option>
+                    <option>Registered Inspector Services</option>
+                  </select>
+                  <input
+                    type="number"
+                    name="rating"
+                    min="1"
+                    max="5"
+                    value={editForm.rating}
+                    onChange={handleEditChange}
+                  />
+                  <button onClick={handleSave} className="review-admin-save-btn">Save</button>
+                </div>
+              ) : (
+                <div>
+                  <p className="review-admin-name">
+                    {review.name} <span className="review-admin-service">({review.service})</span>
+                  </p>
+                  <p className="review-admin-company">{review.company || "N/A"}</p>
+                  <p className="review-admin-rating">
+                    Rating: {review.rating} <span className="review-admin-stars">★</span>
+                  </p>
+                  <p className="review-admin-description">{review.description}</p>
+                </div>
+              )}
+
+              <div className="review-admin-controls">
+                <div className="review-admin-actions">
+                  <button className="review-admin-edit-btn" onClick={() => handleEditClick(review)}>Edit</button>
+                  <button className="review-admin-delete-btn" onClick={() => handleDelete(review.id)}>Delete</button>
+                  <label className="feature-toggle">
+                    <input
+                      type="checkbox"
+                      checked={!!review.featured}
+                      onChange={(e) => handleToggleFeatured(review.id, e.target.checked)}
+                    />
+                    <span className="feature-label">Featured</span>
+                  </label>
+                </div>
+
               </div>
-              <button
-                className="review-admin-delete-btn"
-                onClick={() => handleDelete(review.id)}
-              >
-                Delete
-              </button>
             </div>
           ))
         ) : (
           <p>No reviews found.</p>
         )}
       </div>
-    </div>
-
+    </div >
   );
 };
 

@@ -26,4 +26,24 @@ router.delete("/:id", async (req, res) => {
   res.json({ message: "Deleted successfully" });
 });
 
+// PATCH /api/reviews/:id
+router.patch("/:id", async (req, res) => {
+  const id = req.params.id;
+  const updates = req.body;
+
+  console.log("PATCH /reviews/:id updates received:", updates);
+
+  try {
+    const review = await Review.findByPk(id);
+    if (!review) return res.status(404).json({ error: "Review not found" });
+
+    await review.update(updates);
+    res.json(review);
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ error: "Failed to update review" });
+  }
+});
+
+
 module.exports = router;

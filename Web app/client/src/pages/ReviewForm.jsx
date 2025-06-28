@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import StarRating from "../components/StarRating";
 import "./ReviewForm.css";
+import { useNavigate } from "react-router-dom";
 
-const ReviewForm = ({ onAdd = () => {} }) => {
+const ReviewForm = ({ onAdd = () => { } }) => {
   const [formData, setFormData] = useState({ name: "", company: "", description: "", service: "MEP Engineering" });
   const [rating, setRating] = useState(3);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -19,14 +21,23 @@ const ReviewForm = ({ onAdd = () => {} }) => {
       onAdd(res.data);
       setFormData({ name: "", company: "", description: "", service: "MEP Engineering" });
       setRating(3);
+      
+
+      alert("Thank you for your review!");
+
+      // Redirect to home page
+      navigate("/tutorials");
+
     } catch (error) {
       console.error("Error submitting review:", error);
       alert("Failed to submit review, please try again later.");
     }
   };
 
+
+
   return (
-    
+
     <form onSubmit={handleSubmit} className="review-form">
       <h>Service Review</h>
       <label htmlFor="name">Your Name</label>
@@ -34,7 +45,7 @@ const ReviewForm = ({ onAdd = () => {} }) => {
         id="name"
         name="name"
         type="text"
-        value={formData.name}
+        value={formData.name || ""}
         onChange={handleChange}
         placeholder="Your name"
         required
@@ -45,17 +56,17 @@ const ReviewForm = ({ onAdd = () => {} }) => {
         id="company"
         name="company"
         type="text"
-        value={formData.company}
+        value={formData.company || ""}
         onChange={handleChange}
         placeholder="Your company representation"
         required
-        />
+      />
 
       <label htmlFor="description">Your Review</label>
       <textarea
         id="description"
         name="description"
-        value={formData.description}
+        value={formData.description || ""}
         onChange={handleChange}
         placeholder="Your review"
         required
@@ -65,7 +76,7 @@ const ReviewForm = ({ onAdd = () => {} }) => {
       <select
         id="service"
         name="service"
-        value={formData.service}
+        value={formData.service || ""}
         onChange={handleChange}
       >
         <option>MEP Engineering</option>
