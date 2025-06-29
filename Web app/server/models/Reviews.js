@@ -23,11 +23,11 @@ module.exports = (sequelize, DataTypes) => {
         min: 1,
         max: 5,
       },
-      featured: {
+    },
+    featured: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
       allowNull: false,
-    }
     }
   });
 

@@ -164,7 +164,15 @@ const ReviewAdmin = () => {
                       checked={!!review.featured}
                       onChange={(e) => handleToggleFeatured(review.id, e.target.checked)}
                     />
-                    <span className="feature-label">Featured</span>
+                    <span className="feature-label">
+                      Featured{" "}
+                      {review.featured && (
+                        <span style={{ fontStyle: "italic", fontSize: "0.875rem", color: "#6b7280" }}>
+                          ({review.service})
+                        </span>
+                      )}
+                    </span>
+
                   </label>
                 </div>
 
