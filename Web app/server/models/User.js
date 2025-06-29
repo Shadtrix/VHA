@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(20),
       allowNull: false,
       defaultValue: "user"
+    },
+    resetCode: {
+      type: DataTypes.STRING(10),
+      allowNull: true
     }
   }, {
     tableName: 'users'
@@ -30,4 +34,4 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   return User;
-}
+};

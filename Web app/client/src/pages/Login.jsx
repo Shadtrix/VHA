@@ -37,7 +37,7 @@ function Login() {
           localStorage.setItem("accessToken", res.data.accessToken);
           localStorage.setItem("user", JSON.stringify(res.data.user));
           setUser(res.data.user);
-          toast.success("Logged in successfully");
+          toast.success("Logged in successfully",{ autoClose: 3000 });
           navigate("/");
         })
         .catch((err) => {
@@ -109,7 +109,7 @@ function Login() {
 
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
               <FormControlLabel control={<Checkbox size="small" />} label="Remember for 30 days" />
-              <Link to="#" style={{ fontSize: '0.9rem', textDecoration: 'underline' }}>
+              <Link to="/forgot-password" style={{ fontSize: '0.9rem', textDecoration: 'underline' }}>
                 Forgot password
               </Link>
             </Box>

@@ -18,6 +18,8 @@ import AdminLogin from './pages/Adminlog';
 import AdminSignUp from './pages/Adminsign';
 import AdminInbox from './pages/AdminInbox';
 import EmailContent from './pages/EmailContent';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 import UserContext from './contexts/UserContext';
 import { ToastContainer, toast } from 'react-toastify';
@@ -115,6 +117,9 @@ function AppContent() {
             <Route path="/firesafetyengineering" element={<FireSafetyEngineering />} />
             <Route path="/mechanicalelectricalplumbing" element={<MechanicalElectricalPlumbing />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+
           </Routes>
         </Container>
       </Box>
