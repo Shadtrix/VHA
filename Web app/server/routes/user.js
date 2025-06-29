@@ -147,6 +147,28 @@ router.post("/reset-password", async (req, res) => {
 
     res.json({ message: "Password has been reset successfully." });
 });
+router.delete("/:id", async (req, res) => {
+  try {
+    await User.destroy({ where: { id: req.params.id } });
+    res.json({ message: "User deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete user" });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  const { name, email, password, role } = req.body;
+  try {
+    await User.update(
+      { name, email, password, role },
+      { where: { id: req.params.id } }
+    );
+    res.json({ message: "User updated" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update user" });
+  }
+});
+
 
 
 module.exports = router;

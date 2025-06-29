@@ -6,6 +6,8 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff, Edit } from '@mui/icons-material';
 import http from '../http';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Admin() {
   const [activeSection, setActiveSection] = useState('Dashboard');
@@ -21,6 +23,10 @@ function Admin() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [editedName, setEditedName] = useState('');
+
+  const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [editUserData, setEditUserData] = useState({ name: '', email: '', password: '', role: '' });
 
   useEffect(() => {
     if (activeSection === 'Users') {
@@ -135,7 +141,7 @@ function Admin() {
                       {user.role === 'admin' ? 'Admin' : 'User'}
                     </TableCell>
                     <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
-                    <TableCell sx={{ display: 'flex', alignItems: 'center' }}>
+                    <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Box sx={{
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
@@ -149,6 +155,28 @@ function Admin() {
                       <IconButton onClick={() => togglePassword(user.id)}>
                         {visiblePasswords[user.id] ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
+                      <Button size="small" variant="outlined" onClick={() => {
+                        setSelectedUser(user);
+                        setEditUserData({
+                          name: user.name,
+                          email: user.email,
+                          password: user.password,
+                          role: user.role
+                        });
+                        setEditUserDialogOpen(true);
+                      }}>Edit</Button>
+                      <Button size="small" color="error" variant="outlined" onClick={async () => {
+                        if (window.confirm(`Are you sure to delete ${user.email}?`)) {
+                          try {
+                            await http.delete(`/user/${user.id}`);
+                            setUsers(users.filter(u => u.id !== user.id));
+                            toast.success("User deleted successfully", { autoClose: 3000 });
+                          } catch (err) {
+                            toast.error("Failed to delete user");
+                            console.error(err);
+                          }
+                        }
+                      }}>Delete</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -246,6 +274,37 @@ function Admin() {
       <Paper elevation={3} sx={{ p: 3 }}>
         {renderSection()}
       </Paper>
+
+      {/* Edit User Dialog */}
+      <Dialog open={editUserDialogOpen} onClose={() => setEditUserDialogOpen(false)}>
+        <DialogTitle>Edit User</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+          <TextField label="Name" value={editUserData.name}
+            onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })} />
+          <TextField label="Email" value={editUserData.email}
+            onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })} />
+          <TextField label="Password" value={editUserData.password}
+            onChange={(e) => setEditUserData({ ...editUserData, password: e.target.value })} />
+          <TextField label="Role" value={editUserData.role}
+            onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value })} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditUserDialogOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={async () => {
+            try {
+              await http.put(`/user/${selectedUser.id}`, editUserData);
+              const updated = users.map(u => u.id === selectedUser.id ? { ...u, ...editUserData } : u);
+              setUsers(updated);
+              setEditUserDialogOpen(false);
+            } catch (err) {
+              alert("Failed to update user");
+              console.error(err);
+            }
+          }}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <ToastContainer autoClose={3000} hideProgressBar={false} />
     </Box>
   );
 }
