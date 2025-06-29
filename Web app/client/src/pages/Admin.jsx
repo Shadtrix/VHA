@@ -8,6 +8,8 @@ import { Visibility, VisibilityOff, Edit } from '@mui/icons-material';
 import http from '../http';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ReviewAdmin from './ReviewAdmin';
+
 
 function Admin() {
   const [activeSection, setActiveSection] = useState('Dashboard');
@@ -112,7 +114,7 @@ function Admin() {
   const renderSection = () => {
     switch (activeSection) {
       case 'Dashboard':
-        return <Typography variant="h5">Welcome to the Dashboard</Typography>;
+        return <ReviewAdmin />;
       case 'Users':
         return (
           <>
