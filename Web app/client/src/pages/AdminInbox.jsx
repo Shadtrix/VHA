@@ -107,7 +107,7 @@ function AdminInbox() {
                       <TranslateIcon sx={{ color: 'green' }} />
                     ) : email.summarised ? (
                       <SummarizeIcon sx={{ color: 'blue' }} />
-                    ) : email.generated ? (
+                    ) : email.autoResponse ? (
                       <AutoAwesomeIcon sx={{ color: 'purple' }} />
                     ) : (
                       <EmailIcon />
