@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Email } = require("../models");
 
-// GET all emails
+
 router.get('/', async (req, res) => {
   try {
     const emails = await Email.findAll();
@@ -13,7 +13,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET one email by ID
 router.get('/:id', async (req, res) => {
   try {
     const email = await Email.findByPk(req.params.id);
@@ -25,16 +24,27 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ✅ POST: Create a new email
 router.post('/create', async (req, res) => {
   try {
-    const { sender, email, subject, body, date } = req.body;
-    const newEmail = await Email.create({ sender, email, subject, body, date });
+    const { sender, email, subject, body, date, translated, summarised, autoResponse } = req.body;
+    const newEmail = await Email.create({ sender, email, subject, body, date, translated, summarised, autoResponse});
     res.status(201).json(newEmail);
   } catch (err) {
     console.error("Error creating email:", err);
     res.status(500).json({ error: "Failed to create email" });
   }
 });
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await Email.destroy({ where: { id: req.params.id } });
+    if (deleted) return res.json({ message: 'Email deleted' });
+    return res.status(404).json({ error: 'Email not found' });
+  } catch (err) {
+    console.error("Failed to delete email:", err);
+    res.status(500).json({ error: "Failed to delete email" });
+  }
+});
+
+
 
 module.exports = router;

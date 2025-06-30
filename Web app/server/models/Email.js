@@ -21,6 +21,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: false,
     },
+    translated: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    summarised: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    autoResponse: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   });
 
   return Email;

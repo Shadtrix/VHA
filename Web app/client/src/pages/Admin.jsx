@@ -9,6 +9,7 @@ import http from '../http';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReviewAdmin from './ReviewAdmin';
+import AdminInbox from './AdminInbox';
 
 
 function Admin() {
@@ -190,6 +191,8 @@ function Admin() {
         return <Typography variant="h5">Reports</Typography>;
       case 'Settings':
         return <Typography variant="h5">Settings</Typography>;
+      case 'Inbox':
+        return <AdminInbox />;
       case 'Email Filters':
         return (
           <Box>
@@ -265,7 +268,7 @@ function Admin() {
   return (
     <Box sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        {['Dashboard', 'Users', 'Reports', 'Settings', 'Email Filters'].map(section => (
+        {['Dashboard', 'Users', 'Reports', 'Settings','Inbox' ,'Email Filters'].map(section => (
           <Button key={section}
             variant={activeSection === section ? 'contained' : 'outlined'}
             onClick={() => setActiveSection(section)}>
