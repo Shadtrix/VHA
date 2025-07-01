@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import StarRating from "../components/StarRating";
 import "./ReviewForm.css";
 import { useNavigate } from "react-router-dom";
+import UserContext from "../contexts/UserContext";
 
 const ReviewForm = ({ onAdd = () => { } }) => {
-  const [formData, setFormData] = useState({ name: "", company: "", description: "", service: "MEP Engineering" });
+  const { user } = useContext(UserContext);
+  const [formData, setFormData] = useState({
+    name: "",
+    company: "",
+    description: "",
+    service: "MEP Engineering"
+  });
   const [rating, setRating] = useState(3);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -19,27 +26,33 @@ const ReviewForm = ({ onAdd = () => { } }) => {
     try {
       const res = await axios.post("http://localhost:3001/api/reviews", dataToSend);
       onAdd(res.data);
-      setFormData({ name: "", company: "", description: "", service: "MEP Engineering" });
+      setFormData({
+        name: "",
+        company: "",
+        description: "",
+        service: "MEP Engineering"
+      });
       setRating(3);
-      
-
       alert("Thank you for your review!");
-
-      // Redirect to home page
       navigate("/tutorials");
-
     } catch (error) {
       console.error("Error submitting review:", error);
       alert("Failed to submit review, please try again later.");
     }
   };
 
-
+  if (!user) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center", fontWeight: "bold", color: "#b71c1c" }}>
+        Please log in to submit a review.
+      </div>
+    );
+  }
 
   return (
-
     <form onSubmit={handleSubmit} className="review-form">
-      <h>Service Review</h>
+      <h2>Service Review</h2>
+
       <label htmlFor="name">Your Name</label>
       <input
         id="name"
