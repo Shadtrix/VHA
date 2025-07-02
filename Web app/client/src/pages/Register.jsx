@@ -7,10 +7,30 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Person, Lock, Email } from '@mui/icons-material';
 import { generateAIPassword } from '../utils/generatePassword';
-
+import { useState } from 'react';
 
 function Register() {
   const navigate = useNavigate();
+
+  // AI Role Suggestion Simulation
+  const [emailToCheck, setEmailToCheck] = useState('');
+  const [aiSuggestedRole, setAiSuggestedRole] = useState('');
+
+  const handleAISimulate = () => {
+    const trimmedEmail = emailToCheck.trim().toLowerCase();
+
+    if (trimmedEmail === '') {
+      setAiSuggestedRole('');
+      toast.warn("Please enter an email first.",{ autoClose: 3000 });
+      return;
+    }
+
+    if (trimmedEmail.endsWith('@vha.com')) {
+      setAiSuggestedRole('admin');
+    } else {
+      setAiSuggestedRole('user');
+    }
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -42,6 +62,7 @@ function Register() {
       data.name = data.name.trim();
       data.email = data.email.trim().toLowerCase();
       data.password = data.password.trim();
+
       http.post("/user/register", data)
         .then(() => navigate("/login"))
         .catch(err => {
@@ -66,8 +87,10 @@ function Register() {
   return (
     <Box sx={{
       display: 'flex',
-      height: '100vh',
-      overflow: 'hidden',
+      minHeight: '100vh',
+      height: 'auto',
+      width: '100%',
+      overflow: 'visible',
       backgroundColor: '#f9f9f9'
     }}>
       {/* Left Side - Form */}
@@ -83,7 +106,39 @@ function Register() {
         <Typography variant="h5" fontWeight="bold" textAlign="center">
           Sign up now
         </Typography>
-        <Box component="form" onSubmit={formik.handleSubmit} noValidate>
+
+        {/* AI Role Suggestion UI */}
+        <Box sx={{ mt: 3, p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
+          <Typography variant="subtitle1" fontWeight="bold" mb={1}>
+            AI Role Suggestion (Based on Email)
+          </Typography>
+
+          <TextField
+            fullWidth
+            label="Email Address"
+            value={emailToCheck}
+            onChange={(e) => setEmailToCheck(e.target.value)}
+            placeholder="e.g. john@vha.com"
+            sx={{ mb: 2 }}
+          />
+
+          <Button
+            variant="outlined"
+            onClick={handleAISimulate}
+            sx={{ textTransform: 'none' }}
+          >
+            Ask AI: What Role Should This Be?
+          </Button>
+
+          {aiSuggestedRole && (
+            <Typography mt={2}>
+              🔍 <strong>Suggested Role:</strong> {aiSuggestedRole === 'admin' ? 'Admin' : 'User'}
+            </Typography>
+          )}
+        </Box>
+
+        {/* Registration Form */}
+        <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 3 }}>
           <TextField
             fullWidth margin="dense" label="Name" name="name"
             value={formik.values.name}
@@ -193,11 +248,13 @@ function Register() {
       {/* Right Side - Image */}
       <Box sx={{
         width: '50%',
+        flexShrink: 1,
         display: { xs: 'none', md: 'block' },
-        textAlign: 'center'
+        textAlign: 'center',
+        overflow: 'hidden'
       }}>
         <img
-          src="/src/public/"
+          src="/src/public/Register.png"
           alt="Signup Illustration"
           style={{
             maxWidth: '100%',
