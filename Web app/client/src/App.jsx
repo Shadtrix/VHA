@@ -123,8 +123,7 @@ function AppContent() {
           </Routes>
         </Container>
       </Box>
-
-      <ToastContainer />
+      <ToastContainer autoClose={3000} hideProgressBar={false} />
     </>
   );
 }

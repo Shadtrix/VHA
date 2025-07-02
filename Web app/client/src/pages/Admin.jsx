@@ -11,17 +11,15 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReviewAdmin from './ReviewAdmin';
 import AdminInbox from './AdminInbox';
-
+import FilterListIcon from '@mui/icons-material/FilterList';
+import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
+import { Chip, InputAdornment } from '@mui/material';
 
 function Admin() {
   const [activeSection, setActiveSection] = useState('Dashboard');
   const [users, setUsers] = useState([]);
   const [visiblePasswords, setVisiblePasswords] = useState({});
-
-  const [subject, setSubject] = useState('');
-  const [body, setBody] = useState('');
-  const [sender, setSender] = useState('');
-  const [category, setCategory] = useState([]);
 
   const [categories, setCategories] = useState([]);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -32,6 +30,9 @@ function Admin() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editUserData, setEditUserData] = useState({ name: '', email: '', password: '', role: '' });
 
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [selectedChips, setSelectedChips] = useState([]);
+  const categoriesFromAI = ['NYP', 'Bursary', 'Admissions', 'Enrolment', 'Scholarship', 'Orientation', 'Payment', 'Deadline'];
   useEffect(() => {
     if (activeSection === 'Users') {
       http.get('/user/all')
@@ -63,10 +64,15 @@ function Admin() {
       setEditDialogOpen(false);
       fetchCategories();
     } catch (err) {
-      alert('Failed to update category.');
+      if (err.response?.status === 409) {
+        toast.error("Category name already exists");
+      } else {
+        toast.error("Failed to update category");
+      }
       console.error(err);
     }
   };
+
 
   const togglePassword = (id) => {
     setVisiblePasswords((prev) => ({
@@ -169,12 +175,20 @@ function Admin() {
                   onChange={(e) => setEditedName(e.target.value)}
                 />
                 <Button variant="contained" onClick={async () => {
+                  if (!editedName.trim()) {
+                    toast.error("Category name cannot be empty");
+                    return;
+                  }
                   try {
                     await http.post('/categories', { name: editedName });
                     setEditedName('');
                     fetchCategories();
-                  } catch {
-                    alert('Failed to add category');
+                  } catch (err) {
+                    if (err.response?.status === 409) {
+                      toast.error("Category already exists");
+                    } else {
+                      toast.error("Failed to add category");
+                    }
                   }
                 }}>Add</Button>
               </Box>
@@ -199,8 +213,9 @@ function Admin() {
                             try {
                               await http.delete(`/categories/${cat.id}`);
                               fetchCategories();
+                              toast.success("Category deleted successfully", { autoClose: 3000 });
                             } catch {
-                              alert('Failed to delete');
+                              toast.error("Failed to delete category");
                             }
                           }
                         }}><Delete /></IconButton>
@@ -220,6 +235,62 @@ function Admin() {
                 <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
                 <Button onClick={handleEditSave} variant="contained">Save</Button>
               </DialogActions>
+            </Dialog>
+
+            <Dialog open={filterModalOpen} onClose={() => setFilterModalOpen(false)} fullWidth maxWidth="sm">
+              <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <SearchIcon />
+                  <Typography variant="h6">Smart Email Filter</Typography>
+                </Box>
+                <IconButton onClick={() => setFilterModalOpen(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <Typography variant="body2" mb={2}>
+                  AI has identified these categories from your inbox:
+                </Typography>
+
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                  {categoriesFromAI.map((cat) => (
+                    <Chip
+                      key={cat}
+                      label={cat}
+                      clickable
+                      onClick={() => {
+                        setSelectedChips((prev) =>
+                          prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+                        );
+                      }}
+                      color={selectedChips.includes(cat) ? 'primary' : 'default'}
+                    />
+                  ))}
+                </Box>
+
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                  <Button onClick={() => setSelectedChips([...categoriesFromAI])}>Select all</Button>
+                  <Button onClick={() => setSelectedChips([])}>Clear</Button>
+                  <Button variant="contained" onClick={() => {
+                    toast.success(`Applied filters: ${selectedChips.join(', ') || 'None'}`);
+                    setFilterModalOpen(false);
+                  }}>
+                    Apply filters
+                  </Button>
+                </Box>
+
+                <TextField
+                  fullWidth
+                  placeholder="Search emails"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </DialogContent>
             </Dialog>
           </Box>
         );
@@ -241,6 +312,23 @@ function Admin() {
       </Box>
       <Paper elevation={3} sx={{ p: 3 }}>
         {renderSection()}
+        <IconButton
+          onClick={() => setFilterModalOpen(true)}
+          sx={{
+            position: 'fixed',
+            bottom: 32,
+            right: 32,
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            backgroundColor: 'primary.main',
+            color: 'white',
+            boxShadow: 3,
+            '&:hover': { backgroundColor: 'primary.dark' }
+          }}
+        >
+          <FilterListIcon  />
+        </IconButton>
       </Paper>
 
       {/* Edit User Dialog */}
@@ -271,8 +359,6 @@ function Admin() {
           }}>Save</Button>
         </DialogActions>
       </Dialog>
-
-      <ToastContainer autoClose={3000} hideProgressBar={false} />
     </Box>
   );
 }

@@ -18,7 +18,16 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name } = req.body;
-    await Category.create({ name });
+    if (!name || name.trim() === '') {
+      return res.status(400).send('Category name cannot be empty');
+    }
+
+    const existing = await Category.findOne({ where: { name: name.trim() } });
+    if (existing) {
+      return res.status(409).send('Category name already exists');
+    }
+
+    await Category.create({ name: name.trim() });
     res.status(201).send('Category added');
   } catch (err) {
     console.error(err);
@@ -26,17 +35,35 @@ router.post('/', async (req, res) => {
   }
 });
 
+
 // PUT update category
 router.put('/:id', async (req, res) => {
   try {
     const { name } = req.body;
-    await Category.update({ name }, { where: { id: req.params.id } });
+    if (!name || name.trim() === '') {
+      return res.status(400).send('Category name cannot be empty');
+    }
+
+    const existing = await Category.findOne({
+      where: {
+        name: name.trim(),
+        id: { [db.Sequelize.Op.ne]: req.params.id } // exclude current category
+      }
+    });
+
+    if (existing) {
+      return res.status(409).send('Another category with that name already exists');
+    }
+
+    await Category.update({ name: name.trim() }, { where: { id: req.params.id } });
     res.send('Category updated');
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to update category');
   }
 });
+
+
 
 // DELETE a category
 router.delete('/:id', async (req, res) => {
