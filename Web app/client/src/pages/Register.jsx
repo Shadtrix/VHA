@@ -6,6 +6,8 @@ import http from '../http';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Person, Lock, Email } from '@mui/icons-material';
+import { generateAIPassword } from '../utils/generatePassword';
+
 
 function Register() {
   const navigate = useNavigate();
@@ -47,6 +49,19 @@ function Register() {
         });
     }
   });
+
+  const handleSuggestPassword = async () => {
+    try {
+      const aiPassword = await generateAIPassword();
+      if (aiPassword) {
+        formik.setFieldValue("password", aiPassword);
+        formik.setFieldValue("confirmPassword", aiPassword);
+        toast.info("AI-suggested password inserted.");
+      }
+    } catch (err) {
+      toast.error("Failed to generate password");
+    }
+  };
 
   return (
     <Box sx={{
@@ -114,6 +129,7 @@ function Register() {
               ),
             }}
           />
+
           <TextField
             fullWidth margin="dense" label="Confirm Password" type="password" name="confirmPassword"
             value={formik.values.confirmPassword}
@@ -129,6 +145,16 @@ function Register() {
               ),
             }}
           />
+
+          <Button
+            variant="outlined"
+            fullWidth
+            sx={{ mt: 1, mb: 1 }}
+            onClick={handleSuggestPassword}
+          >
+            Suggest Secure Password (AI)
+          </Button>
+
           <Button
             fullWidth variant="contained" type="submit"
             sx={{ mt: 1.5, backgroundColor: 'black', color: 'white' }}
