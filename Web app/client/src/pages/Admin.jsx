@@ -362,6 +362,7 @@ function Admin() {
           }}>Save</Button>
         </DialogActions>
       </Dialog>
+      <ToastContainer></ToastContainer>
     </Box>
   );
 }
