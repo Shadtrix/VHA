@@ -312,23 +312,26 @@ function Admin() {
       </Box>
       <Paper elevation={3} sx={{ p: 3 }}>
         {renderSection()}
-        <IconButton
-          onClick={() => setFilterModalOpen(true)}
-          sx={{
-            position: 'fixed',
-            bottom: 32,
-            right: 32,
-            width: 56,
-            height: 56,
-            borderRadius: '50%',
-            backgroundColor: 'primary.main',
-            color: 'white',
-            boxShadow: 3,
-            '&:hover': { backgroundColor: 'primary.dark' }
-          }}
-        >
-          <FilterListIcon  />
-        </IconButton>
+        {activeSection === 'Email Filters' && (
+          <IconButton
+            onClick={() => setFilterModalOpen(true)}
+            sx={{
+              position: 'fixed',
+              bottom: 32,
+              right: 32,
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              backgroundColor: 'primary.main',
+              color: 'white',
+              boxShadow: 3,
+              '&:hover': { backgroundColor: 'primary.dark' }
+            }}
+          >
+            <FilterListIcon />
+          </IconButton>
+        )}
+
       </Paper>
 
       {/* Edit User Dialog */}
