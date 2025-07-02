@@ -28,7 +28,6 @@ router.post('/password', async (req, res) => {
     const password = response.data.choices[0].message.content.trim();
     res.json({ password });
   } catch (error) {
-    console.error("OpenAI password generation failed:", error.response?.data || error.message);
     res.status(500).json({ error: 'Failed to generate password' });
   }
 });
