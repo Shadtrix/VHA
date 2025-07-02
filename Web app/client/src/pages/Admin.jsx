@@ -4,6 +4,7 @@ import {
   Table, TableHead, TableRow, TableCell, TableBody,
   Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
+import { Delete } from '@mui/icons-material';
 import { Visibility, VisibilityOff, Edit } from '@mui/icons-material';
 import http from '../http';
 import { ToastContainer, toast } from 'react-toastify';
@@ -47,44 +48,6 @@ function Admin() {
       setCategories(res.data);
     } catch (err) {
       console.error('Failed to load categories', err);
-    }
-  };
-
-  const categorize = () => {
-    const keywords = {
-      Bursary: ["bursary", "financial aid", "gov bursary"],
-      Admissions: ["admission", "open house", "apply"],
-      Enrolment: ["enrol", "register", "matriculation"],
-      Deadline: ["deadline", "reminder", "final date"],
-      NYP: ["nyp"],
-      Orientation: ["orientation", "welcome"],
-      Scholarship: ["scholarship", "merit"],
-      Payment: ["payment", "fee", "invoice"]
-    };
-
-    const text = `${subject} ${body}`.toLowerCase();
-    const matched = [];
-
-    for (const [cat, words] of Object.entries(keywords)) {
-      if (words.some(w => text.includes(w))) {
-        matched.push(cat);
-      }
-    }
-
-    setCategory(matched);
-  };
-
-  const saveEmail = async () => {
-    try {
-      const res = await http.post('/emails', { sender, subject, body });
-      alert(`Saved! Categories: ${res.data.categories.join(', ')}`);
-      setSender('');
-      setSubject('');
-      setBody('');
-      setCategory([]);
-    } catch (err) {
-      alert('Failed to save email.');
-      console.error(err);
     }
   };
 
@@ -240,7 +203,7 @@ function Admin() {
                               alert('Failed to delete');
                             }
                           }
-                        }}><VisibilityOff /></IconButton>
+                        }}><Delete /></IconButton>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -268,7 +231,7 @@ function Admin() {
   return (
     <Box sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        {['Dashboard', 'Users', 'Reports', 'Settings','Inbox' ,'Email Filters'].map(section => (
+        {['Dashboard', 'Users', 'Reports', 'Settings', 'Inbox', 'Email Filters'].map(section => (
           <Button key={section}
             variant={activeSection === section ? 'contained' : 'outlined'}
             onClick={() => setActiveSection(section)}>
