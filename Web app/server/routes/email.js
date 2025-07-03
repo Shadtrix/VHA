@@ -44,6 +44,21 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: "Failed to delete email" });
   }
 });
+router.put('/:id', async (req, res) => {
+  try {
+    const { sender, email, subject, body, date } = req.body;
+    const [updated] = await Email.update(
+      { sender, email, subject, body, date },
+      { where: { id: req.params.id } }
+    );
+    if (updated) return res.json({ message: 'Email updated' });
+    res.status(404).json({ error: 'Email not found' });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ error: 'Failed to update email' });
+  }
+});
+
 
 
 
