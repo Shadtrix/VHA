@@ -53,7 +53,7 @@ const ReviewForm = ({ onAdd = () => {} }) => {
       });
       setRating(3);
       alert("Thank you for your review!");
-      navigate("/tutorials");
+      navigate("/reviews");
     } catch (error) {
       console.error("Error submitting review:", error);
       alert("Failed to submit review, please try again later.");
@@ -73,7 +73,9 @@ const ReviewForm = ({ onAdd = () => {} }) => {
         type="text"
         value={formData.name}
         onChange={handleChange}
-        placeholder="Your name"
+        placeholder="Your name (max 30 characters)"
+        maxLength={30}
+        minLength={3}
         required
       />
 
@@ -84,7 +86,9 @@ const ReviewForm = ({ onAdd = () => {} }) => {
         type="text"
         value={formData.company}
         onChange={handleChange}
-        placeholder="Your company representation"
+        placeholder="Your company representation (max 50 characters)"
+        minLength={3}
+        maxLength={50}
         required
       />
 
