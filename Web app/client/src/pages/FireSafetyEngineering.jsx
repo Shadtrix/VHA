@@ -20,7 +20,7 @@ const FireSafetyEngineering = () => {
         const featuredReviews = allFiveStar.filter(r => r.featured);
         const nonFeaturedReviews = allFiveStar.filter(r => !r.featured);
 
-        let finalReviews = [...featuredReviews];
+        let finalReviews = featuredReviews.sort(() => 0.5 - Math.random());
 
         if (finalReviews.length < 3) {
           const shuffled = nonFeaturedReviews.sort(() => 0.5 - Math.random());
