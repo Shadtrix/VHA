@@ -8,12 +8,12 @@ const crypto = require('crypto');
 require('dotenv').config();
 const { validateToken } = require('../middlewares/auth');
 
-// Simulated email sending
+
 const sendVerificationEmail = (email, code) => {
-    console.log(`Sending code ${code} to ${email}`); // Replace with nodemailer in production
+    console.log(`Sending code ${code} to ${email}`); 
 };
 
-// Register route
+
 router.post("/register", async (req, res) => {
     let data = req.body;
     let role = data.roleKey === "69420" ? "admin" : "user";
@@ -46,7 +46,7 @@ router.post("/register", async (req, res) => {
     }
 });
 
-// Login route
+
 router.post("/login", async (req, res) => {
     let data = req.body;
 
@@ -87,7 +87,7 @@ router.post("/login", async (req, res) => {
     }
 });
 
-// Auth route
+
 router.get("/auth", validateToken, (req, res) => {
     const userInfo = {
         id: req.user.id,
@@ -98,7 +98,7 @@ router.get("/auth", validateToken, (req, res) => {
     res.json({ user: userInfo });
 });
 
-// Fetch all users (admin)
+
 router.get("/all", async (req, res) => {
     try {
         const users = await User.findAll({
@@ -110,7 +110,7 @@ router.get("/all", async (req, res) => {
     }
 });
 
-// Forgot password - send code
+
 router.post("/forgot-password", async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
@@ -124,7 +124,7 @@ router.post("/forgot-password", async (req, res) => {
     res.json({ message: "Verification code sent." });
 });
 
-// Reset password
+
 router.post("/reset-password", async (req, res) => {
     const email = req.body.email?.trim().toLowerCase();
     const code = req.body.code?.trim();

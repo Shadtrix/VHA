@@ -93,7 +93,7 @@ function Register() {
       overflow: 'visible',
       backgroundColor: '#f9f9f9'
     }}>
-      {/* Left Side - Form */}
+      
       <Box sx={{
         width: '50%',
         maxWidth: '500px',
@@ -107,7 +107,7 @@ function Register() {
           Sign up now
         </Typography>
 
-        {/* AI Role Suggestion UI */}
+       
         <Box sx={{ mt: 3, p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
           <Typography variant="subtitle1" fontWeight="bold" mb={1}>
             AI Role Suggestion (Based on Email)
@@ -137,7 +137,7 @@ function Register() {
           )}
         </Box>
 
-        {/* Registration Form */}
+        
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 3 }}>
           <TextField
             fullWidth margin="dense" label="Name" name="name"
@@ -224,7 +224,7 @@ function Register() {
           </Typography>
         </Box>
 
-        {/* Hidden Admin Access */}
+        
         <Box mt={2} textAlign="center">
           <Button
             size="small"
@@ -245,7 +245,7 @@ function Register() {
         <ToastContainer />
       </Box>
 
-      {/* Right Side - Image */}
+      
       <Box sx={{
         width: '50%',
         flexShrink: 1,

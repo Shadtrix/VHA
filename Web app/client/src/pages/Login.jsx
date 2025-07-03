@@ -53,7 +53,7 @@ function Login() {
       overflow: 'hidden',
       backgroundColor: 'white'
     }}>
-      {/* Left side - form */}
+      
       <Box sx={{
         width: '50%',
         display: 'flex',
@@ -132,7 +132,7 @@ function Login() {
         </Box>
       </Box>
 
-      {/* Right side - image */}
+      
       <Box sx={{
         width: '50%',
         display: { xs: 'none', md: 'block' },
