@@ -52,11 +52,8 @@ function AppContent() {
             <Link to="/home" style={{ display: 'flex', alignItems: 'center' }}>
               <img src="/src/public/VHA.png" alt="VHA Logo" style={{ height: '40px' }} />
             </Link>
-            <Link to="/tutorials" style={{ textDecoration: 'none', color: 'white' }}>
+            <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
               <Typography>Reviews</Typography>
-            </Link>
-            <Link to="/rating" style={{ textDecoration: 'none', color: 'white' }}>
-              <Typography>Rating</Typography>
             </Link>
             <Button color="inherit" onClick={handleOpenMenu}>Services</Button>
             <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
@@ -102,8 +99,7 @@ function AppContent() {
         <Container>
           <Routes>
             <Route path="/home" element={<Tutorials />} />
-            <Route path="/tutorials" element={<Tutorials />} />
-            <Route path="/rating" element={<Rating />} />
+            <Route path="/reviews" element={<Tutorials />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin/login" element={<AdminLogin />} />

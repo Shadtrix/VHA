@@ -31,7 +31,7 @@ function AdminInbox() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3001/api/email')  // Your backend API URL
+      .get('http://localhost:3001/api/email')
       .then((res) => {
         setInboxData(res.data);
         setLoading(false);
