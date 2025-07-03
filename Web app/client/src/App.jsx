@@ -52,7 +52,7 @@ function AppContent() {
             <Link to="/home" style={{ display: 'flex', alignItems: 'center' }}>
               <img src="/src/public/VHA.png" alt="VHA Logo" style={{ height: '40px' }} />
             </Link>
-            <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
+            <Link to="/reviews" style={{ textDecoration: 'none', color: 'white' }}>
               <Typography>Reviews</Typography>
             </Link>
             <Button color="inherit" onClick={handleOpenMenu}>Services</Button>
