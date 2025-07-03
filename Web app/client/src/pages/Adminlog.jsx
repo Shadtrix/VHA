@@ -29,7 +29,7 @@ function Adminlog() {
             http.post('/user/login', data)
                 .then((res) => {
                     if (res.data.user.role !== 'admin') {
-                        toast.error('Access denied. Not an admin.');
+                        toast.error('Access denied. Not an admin.', { autoClose: 3000 });
                         return;
                     }
                     localStorage.setItem('accessToken', res.data.accessToken);
@@ -39,7 +39,7 @@ function Adminlog() {
                     navigate('/admin');
                 })
                 .catch((err) => {
-                    toast.error(err?.response?.data?.message || 'Login failed');
+                    toast.error(err?.response?.data?.message || 'Login failed', { autoClose: 3000 });
                 });
         }
     });

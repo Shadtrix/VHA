@@ -41,7 +41,7 @@ function Login() {
           navigate("/");
         })
         .catch((err) => {
-          toast.error(err?.response?.data?.message || "Login failed");
+          toast.error(err?.response?.data?.message || "Login failed", { autoClose: 3000 });
         });
     },
   });
