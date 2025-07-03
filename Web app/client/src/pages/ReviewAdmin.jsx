@@ -30,9 +30,17 @@ const ReviewAdmin = () => {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:3001/api/reviews/${id}`);
-    fetchReviews();
+    const confirmDelete = window.confirm("Are you sure you want to delete this review?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:3001/api/reviews/${id}`);
+      fetchReviews(); // Refresh list after delete
+    } catch (err) {
+      console.error("Failed to delete review:", err);
+    }
   };
+
 
   const handleEditClick = (review) => {
     setEditingReviewId(review.id);
