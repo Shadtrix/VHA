@@ -99,7 +99,7 @@ router.get("/auth", validateToken, (req, res) => {
 });
 
 // Fetch all users (admin)
-router.get("/all", async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         const users = await User.findAll({
             attributes: ['id', 'name', 'email', 'role', 'createdAt', 'password']
