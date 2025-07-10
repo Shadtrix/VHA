@@ -35,7 +35,7 @@ function Admin() {
   const categoriesFromAI = ['NYP', 'Bursary', 'Admissions', 'Enrolment', 'Scholarship', 'Orientation', 'Payment', 'Deadline'];
   useEffect(() => {
     if (activeSection === 'Users') {
-      http.get('/user/all')
+      http.get('/user')
         .then((res) => setUsers(res.data))
         .catch((err) => console.error('Failed to load users', err));
     } else if (activeSection === 'Email Filters') {
