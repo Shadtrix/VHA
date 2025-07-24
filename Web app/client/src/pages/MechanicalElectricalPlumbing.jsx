@@ -4,6 +4,7 @@ import axios from "axios";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./carousel.css";
+import { Rating } from "@mui/material";
 
 const MechanicalElectricalPlumbing = () => {
   const [reviews, setReviews] = useState([]);
@@ -15,11 +16,11 @@ const MechanicalElectricalPlumbing = () => {
 
         const allFiveStar = res.data.filter(
           (review) => review.service === "MEP Engineering" && review.rating === 5 &&
-          review.featured
+            review.featured
         );
 
 
-        setReviews(finalReviews.slice(0, 3));
+        setReviews(allFiveStar.slice(0, 3));
       } catch (error) {
         console.error("Failed to fetch reviews:", error);
       }
@@ -49,9 +50,12 @@ const MechanicalElectricalPlumbing = () => {
                 <div key={index} className="p-4 bg-gray-100 rounded shadow">
                   <p className="italic">"{review.description}"</p>
                   <p className="mt-2 font-semibold text-right">
-                    By {review.name}
-                    {review.company ? ` from ${review.company}` : ""}
+                    By <span style={{ fontWeight: "bold" }}>{review.name}</span>
+                    {review.company ? (
+                      <> from <span style={{ fontWeight: "bold" }}>{review.company}</span></>
+                    ) : ""}
                   </p>
+                  <Rating value={review.rating} readOnly precision={1} size="large" sx={{ mb: 1, fontSize: 36 }} />
                 </div>
               ))}
             </Slider>

@@ -14,21 +14,12 @@ const AnnualFireCertification = () => {
         const res = await axios.get("http://localhost:3001/api/reviews");
 
         const allFiveStar = res.data.filter(
-          (review) => review.service === "Annual Fire Certification" && review.rating === 5
+          (review) => review.service === "MEP Engineering" && review.rating === 5 &&
+            review.featured
         );
 
-        const featuredReviews = allFiveStar.filter(r => r.featured);
-        const nonFeaturedReviews = allFiveStar.filter(r => !r.featured);
 
-        let finalReviews = [...featuredReviews];
-
-        if (finalReviews.length < 3) {
-          const shuffled = nonFeaturedReviews.sort(() => 0.5 - Math.random());
-          const needed = 3 - finalReviews.length;
-          finalReviews = finalReviews.concat(shuffled.slice(0, needed));
-        }
-
-        setReviews(finalReviews.slice(0, 3));
+        setReviews(allFiveStar.slice(0, 3));
       } catch (error) {
         console.error("Failed to fetch reviews:", error);
       }
@@ -58,9 +49,12 @@ const AnnualFireCertification = () => {
                 <div key={index} className="p-4 bg-gray-100 rounded shadow">
                   <p className="italic">"{review.description}"</p>
                   <p className="mt-2 font-semibold text-right">
-                    By {review.name}
-                    {review.company ? ` from ${review.company}` : ""}
+                    By <span style={{ fontWeight: "bold" }}>{review.name}</span>
+                    {review.company ? (
+                      <> from <span style={{ fontWeight: "bold" }}>{review.company}</span></>
+                    ) : ""}
                   </p>
+                  <Rating value={review.rating} readOnly precision={1} size="large" sx={{ mb: 1, fontSize: 36 }} />
                 </div>
               ))}
             </Slider>
