@@ -33,6 +33,11 @@ Object.keys(db).forEach(modelName => {
         db[modelName].associate(db);
     }
 });
+const Category = require('./Category')(sequelize, Sequelize.DataTypes);
+const Email = require('./Email')(sequelize, Sequelize.DataTypes);
+Category.hasMany(Email, { foreignKey: 'category_id' });
+Email.belongsTo(Category, { foreignKey: 'category_id' });
+module.exports = {sequelize, Category, Email};
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 module.exports = db;
