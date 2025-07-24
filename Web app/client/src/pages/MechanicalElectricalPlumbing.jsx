@@ -14,19 +14,10 @@ const MechanicalElectricalPlumbing = () => {
         const res = await axios.get("http://localhost:3001/api/reviews");
 
         const allFiveStar = res.data.filter(
-          (review) => review.service === "MEP Engineering" && review.rating === 5
+          (review) => review.service === "MEP Engineering" && review.rating === 5 &&
+          review.featured
         );
 
-        const featuredReviews = allFiveStar.filter(r => r.featured);
-        const nonFeaturedReviews = allFiveStar.filter(r => !r.featured);
-
-        let finalReviews = [...featuredReviews];
-
-        if (finalReviews.length < 3) {
-          const shuffled = nonFeaturedReviews.sort(() => 0.5 - Math.random());
-          const needed = 3 - finalReviews.length;
-          finalReviews = finalReviews.concat(shuffled.slice(0, needed));
-        }
 
         setReviews(finalReviews.slice(0, 3));
       } catch (error) {

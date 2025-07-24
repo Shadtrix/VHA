@@ -47,3 +47,4 @@ app.use('/api/ai', aiRoute);
 
 const categoryRoutes = require('./routes/categories');
 app.use('/categories', categoryRoutes);
+

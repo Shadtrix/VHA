@@ -11,7 +11,7 @@ function PublicReviews() {
   useEffect(() => {
     http.get('/api/reviews').then((res) => {
       // Filter reviews with rating >= 4
-      const filtered = res.data.filter((review) => review.rating >= 4);
+      const filtered = res.data.filter((review) => review.rating >= 4 && review.featured);
       setReviews(filtered);
     });
   }, []);

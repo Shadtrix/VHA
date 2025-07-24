@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ReviewAdmin.css";
+import ReviewInbox from "./ReviewInbox";
 
 const ReviewAdmin = () => {
   const [reviews, setReviews] = useState([]);
@@ -40,7 +41,6 @@ const ReviewAdmin = () => {
       console.error("Failed to delete review:", err);
     }
   };
-
 
   const handleEditClick = (review) => {
     setEditingReviewId(review.id);
@@ -83,13 +83,17 @@ const ReviewAdmin = () => {
     }
   };
 
-
   const filteredReviews = reviews.filter((r) =>
     filter === "All" ? true : r.service === filter
   );
 
   return (
-    <div className="review-admin-container">
+    <div className="review-admin-container" style={{ position: "relative" }}>
+      {/* Inbox in the top right */}
+      <div style={{ position: "absolute", top: 16, right: 16, width: 350, zIndex: 10 }}>
+        <ReviewInbox />
+      </div>
+
       <h1 className="review-admin-title">Review Management (Admin)</h1>
 
       <div className="review-admin-filter">
@@ -180,10 +184,8 @@ const ReviewAdmin = () => {
                         </span>
                       )}
                     </span>
-
                   </label>
                 </div>
-
               </div>
             </div>
           ))
@@ -191,7 +193,7 @@ const ReviewAdmin = () => {
           <p>No reviews found.</p>
         )}
       </div>
-    </div >
+    </div>
   );
 };
 
