@@ -106,5 +106,3 @@ async function reclassifyAllEmails() {
   await db.end();
   console.log("🎉 Reclassification complete.");
 }
-
-reclassifyAllEmails();

@@ -191,6 +191,21 @@ function Admin() {
                     }
                   }
                 }}>Add</Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={async () => {
+                    try {
+                      toast.info("Classifying emails...", { autoClose: 2000 });
+                      const res = await http.post('/categories/classify');
+                      toast.success(res.data.message || "Classification complete.", { autoClose: 4000 });
+                    } catch (err) {
+                      toast.error("Failed to classify emails");
+                    }
+                  }}
+                >
+                  Classify Emails
+                </Button>
               </Box>
 
               <Table>

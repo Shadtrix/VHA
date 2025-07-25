@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models');
 const Category = db.Category;
+const { reclassifyAllEmails } = require('../utils/classifyEmail');
 
 // GET all categories
 router.get('/', async (req, res) => {
@@ -73,6 +74,15 @@ router.delete('/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).send('Failed to delete category');
+  }
+});
+
+router.post('/classify', async (req, res) => {
+  try {
+    await reclassifyAllEmails();
+    res.json({ success: true, message: 'Classification complete.' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
