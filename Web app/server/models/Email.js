@@ -1,5 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
   const Email = sequelize.define('Email', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
     sender: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -10,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       validate: { isEmail: true },
     },
     subject: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     body: {
@@ -37,11 +42,28 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'categories', // <-- Use table name as string, not imported model
+        model: 'categories',
         key: 'id'
       }
+    },
+    last_classified_at: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
+  }, {
+    tableName: "emails",
+    timestamps: false
   });
+
+  Email.associate = (models) => {
+    Email.belongsTo(models.Category, { foreignKey: "category_id" });
+    Email.belongsToMany(models.Category, {
+      through: "email_categories",
+      foreignKey: "email_id",
+      otherKey: "category_id",
+      as: "matched_categories"
+    });
+  };
 
   return Email;
 };
