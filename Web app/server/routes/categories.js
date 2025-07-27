@@ -82,6 +82,7 @@ router.post('/classify', async (req, res) => {
     await reclassifyAllEmails();
     res.json({ success: true, message: 'Classification complete.' });
   } catch (err) {
+    console.error("Classify error:", err); // <-- Add this
     res.status(500).json({ success: false, message: err.message });
   }
 });

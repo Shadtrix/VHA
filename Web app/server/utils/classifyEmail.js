@@ -29,7 +29,7 @@ Respond only with valid JSON.`
   ];
 
   const input = {
-    modelId: "",
+    modelId: "arn:aws:bedrock:ap-southeast-1:588922096295:inference-profile/apac.anthropic.claude-3-sonnet-20240229-v1:0",
     contentType: "application/json",
     accept: "application/json",
     body: JSON.stringify({
@@ -91,7 +91,11 @@ async function reclassifyAllEmails() {
         await db.query("DELETE FROM email_categories WHERE email_id = ?", [email.id]);
 
         for (const cid of filteredCategoryIds) {
+        try {
           await db.query("INSERT INTO email_categories (email_id, category_id) VALUES (?, ?)", [email.id, cid]);
+          } catch (insertErr) {
+            console.error(`❌ Failed to insert (${email.id}, ${cid}) into email_categories:`, insertErr);
+          }
         }
 
         console.log(`✅ Email ${email.id} classified as: [${filteredCategoryIds.join(", ")}], primary: ${primaryCategoryId}`);
@@ -106,3 +110,4 @@ async function reclassifyAllEmails() {
   await db.end();
   console.log("🎉 Reclassification complete.");
 }
+module.exports = { classifyEmailWithBedrock, reclassifyAllEmails };

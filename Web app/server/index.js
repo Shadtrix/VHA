@@ -32,7 +32,8 @@ const db = require('./models');
 const emailRoute = require('./routes/email');
 app.use('/api/email', emailRoute);
 
-db.sequelize.sync({ alter: true }) // use { force: false } in production
+db.sequelize.sync({ force: false, alter: false })
+ // use { force: false } in production
   .then(() => {
     const port = process.env.APP_PORT || 8080;
     app.listen(port, () => {
