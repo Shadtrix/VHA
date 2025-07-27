@@ -32,7 +32,6 @@ function Admin() {
 
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [selectedChips, setSelectedChips] = useState([]);
-  const categoriesFromAI = ['NYP', 'Bursary', 'Admissions', 'Enrolment', 'Scholarship', 'Orientation', 'Payment', 'Deadline'];
   useEffect(() => {
     if (activeSection === 'Users') {
       http.get('/user')
@@ -268,23 +267,23 @@ function Admin() {
                 </Typography>
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                  {categoriesFromAI.map((cat) => (
-                    <Chip
-                      key={cat}
-                      label={cat}
-                      clickable
-                      onClick={() => {
-                        setSelectedChips((prev) =>
-                          prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-                        );
-                      }}
-                      color={selectedChips.includes(cat) ? 'primary' : 'default'}
-                    />
-                  ))}
+                  {categories.map((cat) => (
+                  <Chip
+                    key={cat.id}
+                    label={cat.name}
+                    clickable
+                    onClick={() => {
+                      setSelectedChips((prev) =>
+                        prev.includes(cat.name) ? prev.filter(c => c !== cat.name) : [...prev, cat.name]
+                      );
+                    }}
+                    color={selectedChips.includes(cat.name) ? 'primary' : 'default'}
+                  />
+                ))}
                 </Box>
 
                 <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                  <Button onClick={() => setSelectedChips([...categoriesFromAI])}>Select all</Button>
+                  <Button onClick={() => setSelectedChips(categories.map(c => c.name))}>Select all</Button>
                   <Button onClick={() => setSelectedChips([])}>Clear</Button>
                   <Button variant="contained" onClick={() => {
                     toast.success(`Applied filters: ${selectedChips.join(', ') || 'None'}`);
