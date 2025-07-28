@@ -15,6 +15,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import { Chip, InputAdornment } from '@mui/material';
+import { TableContainer } from '@mui/material';
 
 function Admin() {
   const [activeSection, setActiveSection] = useState('Dashboard');
@@ -32,6 +33,7 @@ function Admin() {
 
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [selectedChips, setSelectedChips] = useState([]);
+  const [constructiveReviews, setConstructiveReviews] = useState([]);
   useEffect(() => {
     if (activeSection === 'Users') {
       http.get('/user')
@@ -39,6 +41,25 @@ function Admin() {
         .catch((err) => console.error('Failed to load users', err));
     } else if (activeSection === 'Email Filters') {
       fetchCategories();
+    } else if (activeSection === 'Constructive Reviews') {
+      Promise.all([
+        http.get('/api/reviews/moderation-log'),
+        http.get('/api/reviews')
+      ])
+        .then(([logsRes, reviewsRes]) => {
+          const logs = logsRes.data.filter(r => r.constructive);
+          const reviews = reviewsRes.data;
+          // Merge logs with review details
+          const merged = logs.map(log => {
+            const review = reviews.find(r => r.id === log.reviewId);
+            return {
+              ...log,
+              ...review
+            };
+          });
+          setConstructiveReviews(merged);
+        })
+        .catch(err => console.error('Failed to load constructive reviews', err));
     }
   }, [activeSection]);
 
@@ -161,6 +182,68 @@ function Admin() {
         return <Typography variant="h5">Settings</Typography>;
       case 'Inbox':
         return <AdminInbox />;
+      case 'Constructive Reviews':
+        return (
+          <Box>
+            <Typography variant="h5" mb={2}>Constructive Criticism Reviews</Typography>
+            <Button
+              variant="contained"
+              sx={{ mb: 2 }}
+              onClick={async () => {
+                const response = await fetch('http://localhost:3001/api/reviews/export-constructive', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ reviews: constructiveReviews }),
+                });
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'constructive_reviews.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+              }}
+            >
+              Export to Excel
+            </Button>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Review ID</TableCell>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Company</TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>Reason</TableCell>
+                    <TableCell>Rating</TableCell>
+                    <TableCell>Date</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {constructiveReviews.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">No constructive reviews yet.</TableCell>
+                    </TableRow>
+                  ) : (
+                    constructiveReviews.map((log) => (
+                      <TableRow key={log.id}>
+                        <TableCell>{log.reviewId}</TableCell>
+                        <TableCell>{log.name}</TableCell>
+                        <TableCell>{log.company}</TableCell>
+                        <TableCell>{log.description}</TableCell>
+                        <TableCell>{log.reason}</TableCell>
+                        <TableCell>{log.rating}</TableCell>
+                        <TableCell>{log.createdAt ? new Date(log.createdAt).toLocaleString() : ''}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+        );
       case 'Email Filters':
         return (
           <Box>
@@ -268,18 +351,18 @@ function Admin() {
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
                   {categories.map((cat) => (
-                  <Chip
-                    key={cat.id}
-                    label={cat.name}
-                    clickable
-                    onClick={() => {
-                      setSelectedChips((prev) =>
-                        prev.includes(cat.name) ? prev.filter(c => c !== cat.name) : [...prev, cat.name]
-                      );
-                    }}
-                    color={selectedChips.includes(cat.name) ? 'primary' : 'default'}
-                  />
-                ))}
+                    <Chip
+                      key={cat.id}
+                      label={cat.name}
+                      clickable
+                      onClick={() => {
+                        setSelectedChips((prev) =>
+                          prev.includes(cat.name) ? prev.filter(c => c !== cat.name) : [...prev, cat.name]
+                        );
+                      }}
+                      color={selectedChips.includes(cat.name) ? 'primary' : 'default'}
+                    />
+                  ))}
                 </Box>
 
                 <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
@@ -316,7 +399,7 @@ function Admin() {
   return (
     <Box sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        {['Dashboard', 'Users', 'Reports', 'Settings', 'Inbox', 'Email Filters'].map(section => (
+        {['Dashboard', 'Users', 'Reports', 'Settings', 'Inbox', 'Email Filters', 'Constructive Reviews'].map(section => (
           <Button key={section}
             variant={activeSection === section ? 'contained' : 'outlined'}
             onClick={() => setActiveSection(section)}>

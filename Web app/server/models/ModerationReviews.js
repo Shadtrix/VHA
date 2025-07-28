@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
+    constructive:{
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    }
   });
 
   return ModerationLog;
