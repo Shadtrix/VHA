@@ -23,13 +23,17 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     }
   }, {
-    tableName: 'users'
+    tableName: 'users',
+    timestamps: true,
+    paranoid: true,
+    deletedAt: 'deletedAt',
   });
 
   User.associate = (models) => {
     User.hasMany(models.Tutorial, {
       foreignKey: "userId",
-      onDelete: "cascade"
+      onDelete: "cascade",
+      hooks: true
     });
   };
 

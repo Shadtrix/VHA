@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+
 const app = express();
 
 // Enable CORS for frontend
@@ -26,14 +27,18 @@ app.use("/user", userRoute);
 const reviewRoutes = require("./routes/reviews");
 app.use("/api/reviews", reviewRoutes);
 
-// Sequelize DB Connection
-const db = require('./models');
-
 const emailRoute = require('./routes/email');
 app.use('/api/email', emailRoute);
 
+const categoryRoutes = require('./routes/categories');
+app.use('/categories', categoryRoutes);
+
+const aiRoutes = require('./routes/ai'); // fixed to match CommonJS
+app.use('/api/ai', aiRoutes);
+
+// Sequelize DB Connection
+const db = require('./models');
 db.sequelize.sync({ force: false, alter: false })
- // use { force: false } in production
   .then(() => {
     const port = process.env.APP_PORT || 8080;
     app.listen(port, () => {
@@ -43,9 +48,3 @@ db.sequelize.sync({ force: false, alter: false })
   .catch((err) => {
     console.error(" Failed to sync database:", err);
   });
-const aiRoute = require('./routes/ai');
-app.use('/api/ai', aiRoute);
-
-const categoryRoutes = require('./routes/categories');
-app.use('/categories', categoryRoutes);
-

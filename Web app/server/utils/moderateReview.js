@@ -14,10 +14,17 @@ Does the sentiment of the comment match the rating? If not, explain why. If the 
   "featured": false,
   "reason": "Your explanation here"
 }
+If the rating is low (1-3) but the comment is critical and constructive (helpful for improving services), reply with:
+{
+  "featured": false,
+  "reason": "Constructive criticism",
+  "constructive": true
+}
 Otherwise, reply with:
 {
   "featured": true,
-  "reason": ""
+  "reason": "",
+  "constructive": false
 }
 Respond only with valid JSON.`
     }
