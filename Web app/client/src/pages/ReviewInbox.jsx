@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Typography, IconButton, Collapse, Badge } from "@mui/material";
+import { Box, Typography, IconButton, Collapse, Badge, Button } from "@mui/material";
 import MailIcon from "@mui/icons-material/Mail";
 
 const ReviewInbox = () => {
@@ -9,10 +9,20 @@ const ReviewInbox = () => {
 
   useEffect(() => {
     axios.get("http://localhost:3001/api/reviews/moderation-log").then(res => {
-      setLogs(res.data);
+      // Check if inbox has been marked as read in localStorage
+      const markedRead = localStorage.getItem("inboxMarkedRead");
+      if (markedRead === "true") {
+        setLogs([]); // Hide badge
+      } else {
+        setLogs(res.data);
+      }
     });
   }, []);
 
+  const handleMarkAsRead = () => {
+    setLogs([]);
+    localStorage.setItem("inboxMarkedRead", "true");
+  };
   return (
     <Box>
       <Box
@@ -65,6 +75,15 @@ const ReviewInbox = () => {
             border: "1px solid #e0e0e0",
           }}
         >
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{ mb: 2 }}
+            onClick={handleMarkAsRead}
+            disabled={logs.length === 0}
+          >
+            Mark as Read
+          </Button>
           {logs.length === 0 ? (
             <Typography sx={{ mt: 1, color: "#888", textAlign: "center" }}>
               No moderation messages.
