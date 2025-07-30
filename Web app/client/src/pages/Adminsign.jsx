@@ -146,7 +146,6 @@ function Adminsign() {
             Already an admin? <Link to="/admin/login">Sign in</Link>
           </Typography>
         </Box>
-        <ToastContainer />
       </Box>
     </Box>
   );

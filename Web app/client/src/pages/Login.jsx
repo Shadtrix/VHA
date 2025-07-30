@@ -128,7 +128,6 @@ function Login() {
               </Link>
             </Typography>
           </Box>
-          <ToastContainer />
         </Box>
       </Box>
 

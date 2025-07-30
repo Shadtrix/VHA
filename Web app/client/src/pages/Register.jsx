@@ -229,8 +229,6 @@ function Register() {
             Admin access
           </Button>
         </Box>
-
-        <ToastContainer />
       </Box>
 
       <Box sx={{
