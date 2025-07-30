@@ -70,7 +70,6 @@ function Adminlog() {
                         Login
                     </Button>
                 </Box>
-                <ToastContainer />
             </Box>
         </Box>
     );

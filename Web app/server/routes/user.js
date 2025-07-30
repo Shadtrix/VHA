@@ -122,9 +122,9 @@ router.get("/auth", validateToken, (req, res) => {
 // Fetch all users (admin)
 router.get("/", async (req, res) => {
   try {
-    const includeDeleted = req.query.includeDeleted === 'true';
+    const includeDeleted = true;
     const users = await User.findAll({
-      attributes: ['id', 'name', 'email', 'role', 'createdAt', 'password'],
+      attributes: ['id', 'name', 'email', 'role', 'createdAt', 'password', 'deletedAt'],
       paranoid: !includeDeleted
     });
     res.json(users);
@@ -197,8 +197,8 @@ router.put("/:id", async (req, res) => {
 router.get("/deleted", async (req, res) => {
   try {
     const users = await User.findAll({
-      where: {},              // get all
-      paranoid: false,        // include soft-deleted
+      where: {},              
+      paranoid: false,        
       attributes: ['id', 'name', 'email', 'role', 'createdAt', 'deletedAt']
     });
 

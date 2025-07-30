@@ -30,14 +30,15 @@ function Admin() {
   const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [editUserData, setEditUserData] = useState({ name: '', email: '', password: '', role: '' });
-
+  const [showDeletedOnly, setShowDeletedOnly] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [selectedChips, setSelectedChips] = useState([]);
   const [constructiveReviews, setConstructiveReviews] = useState([]);
   const [filteredEmails, setFilteredEmails] = useState([]);
   useEffect(() => {
     if (activeSection === 'Users') {
-      http.get('/user?includeDeleted=true')
+      const endpoint = showDeletedOnly ? '/user/deleted' : '/user';
+      http.get(endpoint)
         .then((res) => setUsers(res.data))
         .catch((err) => console.error('Failed to load users', err));
     } else if (activeSection === 'Email Filters') {
@@ -62,7 +63,7 @@ function Admin() {
         })
         .catch(err => console.error('Failed to load constructive reviews', err));
     }
-  }, [activeSection]);
+  }, [activeSection, showDeletedOnly]);
 
   const fetchCategories = async () => {
     try {
@@ -110,6 +111,13 @@ function Admin() {
         return (
           <>
             <Typography variant="h5" mb={2}>User List</Typography>
+            <Button
+              variant="outlined"
+              sx={{ mb: 2 }}
+              onClick={() => setShowDeletedOnly(prev => !prev)}
+            >
+              {showDeletedOnly ? "Show All Users" : "Show Only Deleted Users"}
+            </Button>
             <Table>
               <TableHead>
                 <TableRow>
@@ -122,114 +130,117 @@ function Admin() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((user) => (
-                  <TableRow
-                    key={user.id}
-                    sx={user.deletedAt ? {
-                      color: 'gray',
-                      '& td': {
-                        color: 'gray',
-                        textDecoration: 'line-through',
-                        opacity: 0.6
-                      }
-                    } : {}}
-                  >
-                    <TableCell>{user.id}</TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell style={{
-                      fontWeight: 'bold',
-                      color: user.role === 'admin' ? 'red' : 'black'
-                    }}>
-                      {user.role === 'admin' ? 'Admin' : 'User'}
-                    </TableCell>
-                    <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
-                    <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {user.deletedAt ? (
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={async () => {
-                            try {
-                              await http.post(`/user/restore/${user.id}`);
-                              toast.success("User restored");
-                              setUsers(users.map(u => u.id === user.id ? { ...u, deletedAt: null } : u));
-                            } catch (err) {
-                              toast.error("Failed to restore user");
-                              console.error(err);
-                            }
-                          }}
-                        >
-                          Restore
-                        </Button>
-                      ) : (
-                        <>
+                {users
+                  .filter(user => showDeletedOnly ? user.deletedAt !== null : true)
+                  .map((user) => (
+                    <TableRow
+                      key={user.id}
+                      sx={user.deletedAt ? {
+                        '& td:not(:last-child)': {
+                          color: 'gray',
+                          textDecoration: 'line-through',
+                          opacity: 0.6
+                        }
+                      } : {}}
+
+                    >
+                      <TableCell>{user.id}</TableCell>
+                      <TableCell>{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell style={{
+                        fontWeight: 'bold',
+                        color: user.role === 'admin' ? 'red' : 'black'
+                      }}>
+                        {user.role === 'admin' ? 'Admin' : 'User'}
+                      </TableCell>
+                      <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+                      <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {user.deletedAt ? (
                           <Button
                             size="small"
-                            variant="outlined"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setEditUserData({
-                                name: user.name,
-                                email: user.email,
-                                role: user.role
-                              });
-                              setEditUserDialogOpen(true);
-                            }}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            size="small"
-                            color="error"
                             variant="outlined"
                             onClick={async () => {
-                              if (window.confirm(`Soft delete ${user.email}?`)) {
-                                try {
-                                  await http.delete(`/user/${user.id}`);
-                                  setUsers(users.map(u =>
-                                    u.id === user.id
-                                      ? { ...u, deletedAt: new Date().toISOString() }
-                                      : u
-                                  ));
-                                  toast.success("User soft-deleted", { autoClose: 3000 });
-                                } catch (err) {
-                                  toast.error("Failed to soft delete user");
-                                  console.error(err);
-                                }
+                              try {
+                                await http.post(`/user/restore/${user.id}`);
+                                toast.success("User restored");
+                                setUsers(users.map(u => u.id === user.id ? { ...u, deletedAt: null } : u));
+                              } catch (err) {
+                                toast.error("Failed to restore user");
+                                console.error(err);
                               }
                             }}
                           >
-                            Soft Delete
+                            Restore
                           </Button>
-                          <Button
-                            size="small"
-                            color="warning"
-                            variant="outlined"
-                            onClick={async () => {
-                              if (window.confirm(`PERMANENTLY delete ${user.email}? This cannot be undone.`)) {
-                                try {
-                                  await http.delete(`/user/hard/${user.id}`);
-                                  setUsers(users.filter(u => u.id !== user.id));
-                                  toast.success("User hard-deleted", { autoClose: 3000 });
-                                } catch (err) {
-                                  toast.error("Failed to hard delete user");
-                                  console.error(err);
+                        ) : (
+                          <>
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setEditUserData({
+                                  name: user.name,
+                                  email: user.email,
+                                  role: user.role
+                                });
+                                setEditUserDialogOpen(true);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              size="small"
+                              color="error"
+                              variant="outlined"
+                              onClick={async () => {
+                                if (window.confirm(`Soft delete ${user.email}?`)) {
+                                  try {
+                                    await http.delete(`/user/${user.id}`);
+                                    setUsers(users.map(u =>
+                                      u.id === user.id
+                                        ? { ...u, deletedAt: new Date().toISOString() }
+                                        : u
+                                    ));
+                                    toast.success("User soft-deleted", { autoClose: 3000 });
+                                  } catch (err) {
+                                    toast.error("Failed to soft delete user");
+                                    console.error(err);
+                                  }
                                 }
-                              }
-                            }}
-                          >
-                            Hard Delete
-                          </Button>
-                        </>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                              }}
+                            >
+                              Soft Delete
+                            </Button>
+                            <Button
+                              size="small"
+                              color="warning"
+                              variant="outlined"
+                              onClick={async () => {
+                                if (window.confirm(`PERMANENTLY delete ${user.email}? This cannot be undone.`)) {
+                                  try {
+                                    await http.delete(`/user/hard/${user.id}`);
+                                    setUsers(users.filter(u => u.id !== user.id));
+                                    toast.success("User hard-deleted", { autoClose: 3000 });
+                                  } catch (err) {
+                                    toast.error("Failed to hard delete user");
+                                    console.error(err);
+                                  }
+                                }
+                              }}
+                            >
+                              Hard Delete
+                            </Button>
+                          </>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
             </Table>
           </>
         );
+
 
       case 'Reports':
         return <Typography variant="h5">Reports</Typography>;
@@ -557,7 +568,6 @@ function Admin() {
           }}>Save</Button>
         </DialogActions>
       </Dialog>
-      <ToastContainer></ToastContainer>
     </Box>
   );
 }
