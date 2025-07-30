@@ -405,7 +405,9 @@ function Admin() {
                           <TableCell>{email.subject}</TableCell>
                           <TableCell>{email.sender} ({email.email})</TableCell>
                           <TableCell>{new Date(email.date).toLocaleString()}</TableCell>
-                          <TableCell>{email.category_id}</TableCell>
+                          <TableCell>
+                            {email.category_ids ? email.category_ids.join(', ') : email.category_id}
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -465,14 +467,12 @@ function Admin() {
                       try {
                         const chipNames = selectedChips;
                         const selected = categories.filter(c => chipNames.includes(c.name));
-                        const results = [];
+                        const categoryIds = selected.map(c => c.id);
 
-                        for (const category of selected) {
-                          const res = await http.get(`/categories/by-category/${category.id}`);
-                          results.push(...res.data);
-                        }
+                        const query = categoryIds.join(',');
+                        const res = await http.get(`/categories/by-category?ids=${query}`);
 
-                        setFilteredEmails(results);
+                        setFilteredEmails(res.data);
                         toast.success(`Applied filters: ${chipNames.join(', ') || 'None'}`);
                         setFilterModalOpen(false);
                       } catch (err) {

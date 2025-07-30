@@ -3,8 +3,7 @@ const router = express.Router();
 const db = require('../models');
 const Category = db.Category;
 const { reclassifyAllEmails } = require('../utils/classifyEmail');
-const Email = db.Email;
-
+const { Email, EmailCategory } = db;
 // GET all categories
 router.get('/', async (req, res) => {
   try {
@@ -88,16 +87,44 @@ router.post('/classify', async (req, res) => {
   }
 });
 
-router.get('/by-category/:id', async (req, res) => {
+router.get('/by-category', async (req, res) => {
   try {
-    const emails = await Email.findAll({
-      where: { category_id: req.params.id }
+    const ids = req.query.ids?.split(',').map(id => parseInt(id)) || [];
+
+    if (!ids.length) {
+      return res.status(400).json({ error: 'No category IDs provided' });
+    }
+
+    const results = await db.EmailCategory.findAll({
+      where: {
+        category_id: ids
+      },
+      include: [{
+        model: db.Email,
+        required: true
+      }]
     });
-    res.json(emails);
+
+    // Map email_id to { email, categoryIds }
+    const emailMap = new Map();
+
+    results.forEach(result => {
+      const email = result.Email;
+      const emailId = email.id;
+
+      if (!emailMap.has(emailId)) {
+        emailMap.set(emailId, { ...email.toJSON(), category_ids: [] });
+      }
+
+      emailMap.get(emailId).category_ids.push(result.category_id);
+    });
+
+    const emailsWithCategories = Array.from(emailMap.values());
+
+    res.json(emailsWithCategories);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch emails by category' });
+    console.error("Failed to fetch filtered emails:", err);
+    res.status(500).json({ error: 'Failed to fetch filtered emails' });
   }
 });
-
 module.exports = router;
