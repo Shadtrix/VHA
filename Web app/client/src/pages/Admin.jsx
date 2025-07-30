@@ -439,7 +439,8 @@ function Admin() {
               </DialogTitle>
               <DialogContent>
                 <Typography variant="body2" mb={2}>
-                  AI has identified these categories from your inbox:
+                  Your emails have been organized by AI using the categories set by the admin. You can filter emails by selecting categories below.
+                  Click on a category to toggle its selection. Use the "Select all" and "Clear" buttons to manage your selections.
                 </Typography>
 
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
@@ -464,16 +465,23 @@ function Admin() {
                   <Button
                     variant="contained"
                     onClick={async () => {
-                      try {
-                        const chipNames = selectedChips;
-                        const selected = categories.filter(c => chipNames.includes(c.name));
-                        const categoryIds = selected.map(c => c.id);
+                      const chipNames = selectedChips;
+                      const selected = categories.filter(c => chipNames.includes(c.name));
+                      const categoryIds = selected.map(c => c.id);
 
+                      if (categoryIds.length === 0) {
+                        setFilteredEmails([]); // No filters → clear results
+                        toast.info("No filters selected. Showing 0 emails.");
+                        setFilterModalOpen(false);
+                        return;
+                      }
+
+                      try {
                         const query = categoryIds.join(',');
                         const res = await http.get(`/categories/by-category?ids=${query}`);
 
                         setFilteredEmails(res.data);
-                        toast.success(`Applied filters: ${chipNames.join(', ') || 'None'}`);
+                        toast.success(`Applied filters: ${chipNames.join(', ')}`);
                         setFilterModalOpen(false);
                       } catch (err) {
                         toast.error("Failed to fetch filtered emails");
@@ -484,18 +492,6 @@ function Admin() {
                     Apply filters
                   </Button>
                 </Box>
-
-                <TextField
-                  fullWidth
-                  placeholder="Search emails"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    )
-                  }}
-                />
               </DialogContent>
             </Dialog>
           </Box>
