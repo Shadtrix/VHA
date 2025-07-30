@@ -3,6 +3,10 @@ const mysql = require("mysql2/promise");
 const { BedrockRuntimeClient, InvokeModelCommand } = require("@aws-sdk/client-bedrock-runtime");
 
 const client = new BedrockRuntimeClient({ region: "ap-southeast-1" });
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 async function classifyEmailWithBedrock(subject, body, categories) {
   const categoryList = categories.map(
@@ -75,39 +79,45 @@ async function reclassifyAllEmails() {
   const [emails] = await db.query("SELECT * FROM emails");
 
   for (const email of emails) {
-    try {
-      const categoryIds = await classifyEmailWithBedrock(email.subject, email.body, categories);
+    while (true) {
+      try {
+        await sleep(2000);
 
-      const filteredCategoryIds = categoryIds.filter((id) => validCategoryIds.includes(id));
+        const categoryIds = await classifyEmailWithBedrock(email.subject, email.body, categories);
+        const filteredCategoryIds = categoryIds.filter((id) => validCategoryIds.includes(id));
 
-      if (filteredCategoryIds.length > 0) {
-        const primaryCategoryId = filteredCategoryIds[0];
+        if (filteredCategoryIds.length > 0) {
+          const primaryCategoryId = filteredCategoryIds[0];
 
-        await db.query(
-          "UPDATE emails SET category_id = ?, last_classified_at = NOW() WHERE id = ?",
-          [primaryCategoryId, email.id]
-        );
+          await db.query(
+            "UPDATE emails SET category_id = ?, last_classified_at = NOW() WHERE id = ?",
+            [primaryCategoryId, email.id]
+          );
 
-        await db.query("DELETE FROM email_categories WHERE email_id = ?", [email.id]);
+          await db.query("DELETE FROM email_categories WHERE email_id = ?", [email.id]);
 
-        for (const cid of filteredCategoryIds) {
-        try {
-          await db.query("INSERT INTO email_categories (email_id, category_id) VALUES (?, ?)", [email.id, cid]);
-          } catch (insertErr) {
-            console.error(`❌ Failed to insert (${email.id}, ${cid}) into email_categories:`, insertErr);
+          for (const cid of filteredCategoryIds) {
+            try {
+              await db.query("INSERT INTO email_categories (email_id, category_id) VALUES (?, ?)", [email.id, cid]);
+            } catch (insertErr) {
+              console.error(`❌ Failed to insert (${email.id}, ${cid}) into email_categories:`, insertErr);
+            }
           }
+
+          console.log(`✅ Email ${email.id} classified as: [${filteredCategoryIds.join(", ")}], primary: ${primaryCategoryId}`);
+        } else {
+          console.warn(`⚠️ Email ${email.id} returned no valid category IDs.`);
         }
 
-        console.log(`✅ Email ${email.id} classified as: [${filteredCategoryIds.join(", ")}], primary: ${primaryCategoryId}`);
-      } else {
-        console.warn(`⚠️ Email ${email.id} returned no valid category IDs.`);
+        break;
+
+      } catch (err) {
+        console.error(`❌ Error classifying email ${email.id}, retrying in 5s...`, err.message);
+        await sleep(5000);
       }
-    } catch (err) {
-      console.error(`❌ Error classifying email ${email.id}:`, err.message);
     }
   }
 
-  await db.end();
   console.log("🎉 Reclassification complete.");
 }
 module.exports = { classifyEmailWithBedrock, reclassifyAllEmails };
