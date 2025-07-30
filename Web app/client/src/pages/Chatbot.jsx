@@ -29,7 +29,7 @@ export default function Chatbot() {
       <div className="chat-log">
         {messages.map((msg, i) => (
           <div key={i} className={`message ${msg.from}`}>
-            <strong>{msg.from === "user" ? "You" : "NaggyNago"}:</strong> {msg.text}
+            <strong>{msg.from === "user" ? "You" : "Vincent Ai"}:</strong> {msg.text}
           </div>
         ))}
       </div>

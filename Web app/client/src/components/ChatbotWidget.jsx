@@ -2,12 +2,14 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import ChatbotContext from "../contexts/ChatbotContext.jsx";
 import "../components/chatbot.css";
+import UserContext from "../contexts/UserContext";
 
 export default function ChatbotWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
 
-  const { messages, addMessage, clearMessages } = useContext(ChatbotContext); // include clearMessages
+  const { messages, addMessage, clearMessages } = useContext(ChatbotContext);
+  const { user } = useContext(UserContext); // ✅ get user
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -48,7 +50,12 @@ export default function ChatbotWidget() {
           <div className="chatbot-messages">
             {messages.map((msg, i) => (
               <div key={i} className={`chat-msg ${msg.from}`}>
-                <strong>{msg.from === "user" ? "You" : "NaggyNago"}:</strong>{" "}
+                <strong>
+                  {msg.from === "user"
+                    ? user?.name || "You"
+                    : "Vincent Ai"}
+                  :
+                </strong>{" "}
                 {msg.text}
               </div>
             ))}
@@ -69,3 +76,4 @@ export default function ChatbotWidget() {
     </div>
   );
 }
+
