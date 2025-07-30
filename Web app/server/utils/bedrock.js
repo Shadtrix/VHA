@@ -7,8 +7,6 @@ require("dotenv").config();
 
 const bedrock = new BedrockRuntimeClient({
   region: process.env.AWS_REGION,
-  // Remove explicit credentials — let AWS SDK read from system env
-  // credentials will be automatically read from process.env
 });
 
 async function callClaude(prompt) {
