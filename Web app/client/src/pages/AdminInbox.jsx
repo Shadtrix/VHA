@@ -20,7 +20,7 @@ function AdminInbox() {
     email: '',
     subject: '',
     body: '',
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split('T')[0], 
   });
   const [formError, setFormError] = useState('');
   const [editingEmailId, setEditingEmailId] = useState(null);

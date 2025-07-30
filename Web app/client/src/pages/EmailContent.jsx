@@ -16,9 +16,6 @@ function EmailContent() {
   const [email, setEmail] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [editMode, setEditMode] = useState(false);
-const [editedSubject, setEditedSubject] = useState(email.subject);
-const [editedBody, setEditedBody] = useState(email.body);
 
 
   useEffect(() => {
