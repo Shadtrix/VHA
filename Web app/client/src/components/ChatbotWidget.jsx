@@ -1,28 +1,29 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
+import ChatbotContext from "../contexts/ChatbotContext.jsx";
 import "../components/chatbot.css";
-
 
 export default function ChatbotWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([]);
+
+  const { messages, addMessage, clearMessages } = useContext(ChatbotContext); // include clearMessages
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMsg = { from: "user", text: input };
-    setMessages((prev) => [...prev, userMsg]);
+    addMessage(userMsg);
     setInput("");
 
     try {
       const res = await axios.post("http://localhost:3001/api/chatbot", {
-        message: input
+        message: input,
       });
       const botReply = { from: "bot", text: res.data.reply };
-      setMessages((prev) => [...prev, botReply]);
+      addMessage(botReply);
     } catch (err) {
-      setMessages((prev) => [...prev, { from: "bot", text: " AI failed to respond." }]);
+      addMessage({ from: "bot", text: " AI failed to respond." });
     }
   };
 
@@ -36,13 +37,19 @@ export default function ChatbotWidget() {
         <div className="chatbot-box">
           <div className="chatbot-header">
             <strong>VHA Assistant</strong>
-            <button onClick={() => setOpen(false)}>×</button>
+            <div>
+              <button onClick={clearMessages} style={{ marginRight: "8px" }}>
+                🗑 Clear
+              </button>
+              <button onClick={() => setOpen(false)}>×</button>
+            </div>
           </div>
 
           <div className="chatbot-messages">
             {messages.map((msg, i) => (
               <div key={i} className={`chat-msg ${msg.from}`}>
-                <strong>{msg.from === "user" ? "You" : "Nago Nago"}:</strong> {msg.text}
+                <strong>{msg.from === "user" ? "You" : "NaggyNago"}:</strong>{" "}
+                {msg.text}
               </div>
             ))}
           </div>

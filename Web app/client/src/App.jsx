@@ -35,7 +35,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ChatbotWidget from './components/ChatbotWidget'; // ✅ Chatbot component
 import UserContext from './contexts/UserContext';
-
+import { ChatbotProvider } from './contexts/ChatbotContext.jsx';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -141,11 +141,14 @@ function AppContent() {
   );
 }
 
+
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <ChatbotProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </ChatbotProvider>
   );
 }
 

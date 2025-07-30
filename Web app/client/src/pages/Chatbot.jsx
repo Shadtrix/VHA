@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import "../themes/chatbot.css"; // optional if you want to style
+import "../themes/chatbot.css"; 
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([]);
@@ -29,7 +29,7 @@ export default function Chatbot() {
       <div className="chat-log">
         {messages.map((msg, i) => (
           <div key={i} className={`message ${msg.from}`}>
-            <strong>{msg.from === "user" ? "You" : "Nago Nago"}:</strong> {msg.text}
+            <strong>{msg.from === "user" ? "You" : "NaggyNago"}:</strong> {msg.text}
           </div>
         ))}
       </div>
