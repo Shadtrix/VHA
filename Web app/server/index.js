@@ -33,7 +33,7 @@ app.use('/api/email', emailRoute);
 const categoryRoutes = require('./routes/categories');
 app.use('/categories', categoryRoutes);
 
-const aiRoutes = require('./routes/ai'); // fixed to match CommonJS
+const aiRoutes = require('./routes/ai');
 app.use('/api/ai', aiRoutes);
 
 // Sequelize DB Connection

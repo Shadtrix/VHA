@@ -7,7 +7,7 @@ const { sign } = require('jsonwebtoken');
 const crypto = require('crypto');
 require('dotenv').config();
 const { validateToken } = require('../middlewares/auth');
-const callClaudeForRole = require('../utils/bedrock'); // ✅ adjust path if needed
+const { callClaude } = require('../utils/bedrockrole');
 
 // Simulated email sending
 const sendVerificationEmail = (email, code) => {
@@ -17,20 +17,6 @@ const sendVerificationEmail = (email, code) => {
 // Register route
 router.post("/register", async (req, res) => {
   let data = req.body;
-  // Default role
-  let role = "user";
-
-  // If Claude AI provides role, use it
-  if (data.role === "admin") {
-    role = "admin";
-  }
-
-  // Manual override by roleKey
-  if (data.roleKey === "69420") {
-    role = "admin";
-  }
-
-
   const validationSchema = yup.object({
     name: yup.string().trim().min(3).max(50).required().matches(/^[a-zA-Z '-,.]+$/, "Name only allows letters, spaces and characters: ' - , ."),
     email: yup.string().trim().lowercase().email().max(50).required(),
@@ -39,24 +25,46 @@ router.post("/register", async (req, res) => {
   });
 
   try {
-    data = await validationSchema.validate(data, { abortEarly: false });
+  data = await validationSchema.validate(data, { abortEarly: false });
 
-    const existingUser = await User.findOne({ where: { email: data.email } });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already exists." });
+  let role = "user";
+
+  try {
+    const aiResponse = await callClaude(
+      `Assign a role for this email: ${data.email}. If it ends with @vha.com, the role should be "admin". Otherwise, "user". Just reply with the word admin or user.`
+    );
+
+    const cleaned = aiResponse.trim().toLowerCase();
+    console.log("Claude AI assigned role:", cleaned);
+    if (cleaned === "admin") {
+      role = "admin";
     }
-
-    const newUser = await User.create({
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      role
-    });
-    console.log(`✅ [REGISTERED] ${newUser.email} | Role: ${newUser.role}`);
-    res.json({ message: `Email ${newUser.email} was registered successfully.` });
-  } catch (err) {
-    res.status(400).json({ errors: err.errors });
+  } catch (aiErr) {
+    console.warn("Claude role assignment failed:", aiErr);
   }
+
+  if (req.body.roleKey === "69420") {
+    role = "admin";
+  }
+
+  const existingUser = await User.findOne({ where: { email: data.email } });
+  if (existingUser) {
+    return res.status(400).json({ message: "Email already exists." });
+  }
+
+  const newUser = await User.create({
+    name: data.name,
+    email: data.email,
+    password: data.password,
+    role
+  });
+
+  console.log(`\x1b[32m✔ [REGISTERED]\x1b[0m ${newUser.email} | Role: ${newUser.role}`);
+  res.json({ message: `Email ${newUser.email} was registered successfully.` });
+} catch (err) {
+  res.status(400).json({ errors: err.errors });
+}
+
 });
 
 // Login route

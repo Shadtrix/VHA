@@ -50,7 +50,7 @@ function Register() {
       const aiRole = await getAIRole(data.email);
       console.log("Claude role response:", aiRole); // <-- add this line
       data.role = aiRole || "user";
-
+      console.log("Sending role from Claude:", data.role);
       http.post("/user/register", data)
         .then(() => navigate("/login"))
         .catch(err => {
