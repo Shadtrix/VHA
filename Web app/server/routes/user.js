@@ -219,5 +219,18 @@ router.post("/restore/:id", async (req, res) => {
   }
 });
 
+// Hard delete (PERMANENT DELETE)
+router.delete("/hard/:id", async (req, res) => {
+  try {
+    await User.destroy({
+      where: { id: req.params.id },
+      force: true // bypass soft delete
+    });
+    res.json({ message: "User hard-deleted permanently" });
+  } catch (err) {
+    console.error("Hard delete failed:", err);
+    res.status(500).json({ message: "Hard delete failed", error: err.message });
+  }
+});
 
 module.exports = router;
