@@ -9,11 +9,17 @@ import {
 } from '@mui/material';
 import MailIcon from '@mui/icons-material/Mail';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function EmailContent() {
   const { id } = useParams();
   const [email, setEmail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [editMode, setEditMode] = useState(false);
+const [editedSubject, setEditedSubject] = useState(email.subject);
+const [editedBody, setEditedBody] = useState(email.body);
+
 
   useEffect(() => {
     axios.get(`http://localhost:3001/api/email/${id}`)
@@ -73,6 +79,22 @@ const handleGenerateResponse = async () => {
       }}
     >
       <Container maxWidth="md">
+        <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 2 }}>
+        <Button
+          variant="contained"
+          onClick={() => navigate('/admin')}
+          sx={{
+            backgroundColor: '#ff6b6b', // unique coral/red color
+            color: '#fff',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: '#ff5252',
+            },
+          }}
+        >
+          ← Back to Admin
+        </Button>
+      </Box>
         {/* Sender Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Avatar sx={{ bgcolor: '#1976d2', mr: 2 }}>
@@ -160,5 +182,6 @@ const handleGenerateResponse = async () => {
     </Box>
   );
 }
+
 
 export default EmailContent;
