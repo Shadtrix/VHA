@@ -101,8 +101,10 @@ router.get("/auth", validateToken, (req, res) => {
 // Fetch all users (admin)
 router.get("/", async (req, res) => {
     try {
+        const includeDeleted = req.query.includeDeleted === 'true';
         const users = await User.findAll({
-            attributes: ['id', 'name', 'email', 'role', 'createdAt', 'password']
+            attributes: ['id', 'name', 'email', 'role', 'createdAt', 'password'],
+            paranoid: !includeDeleted
         });
         res.json(users);
     } catch (err) {
@@ -150,11 +152,13 @@ router.post("/reset-password", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     await User.destroy({ where: { id: req.params.id } });
-    res.json({ message: "User deleted" });
+    res.json({ message: "User soft-deleted" });
   } catch (err) {
-    res.status(500).json({ message: "Failed to delete user" });
+    console.error("Delete failed:", err); // ✅ full stack trace
+    res.status(500).json({ message: "Failed to delete user", error: err.message });
   }
 });
+
 
 router.put("/:id", async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -169,6 +173,30 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+router.get("/deleted", async (req, res) => {
+  try {
+    const users = await User.findAll({
+      where: {},              // get all
+      paranoid: false,        // include soft-deleted
+      attributes: ['id', 'name', 'email', 'role', 'createdAt', 'deletedAt']
+    });
+
+    const deletedOnly = users.filter(user => user.deletedAt !== null);
+    res.json(deletedOnly);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch soft-deleted users" });
+  }
+});
+
+router.post("/restore/:id", async (req, res) => {
+  try {
+    await User.restore({ where: { id: req.params.id } }); // ✅ restore method
+    res.json({ message: "User restored successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to restore user" });
+  }
+});
 
 
 module.exports = router;

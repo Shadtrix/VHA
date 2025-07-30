@@ -35,8 +35,13 @@ function Adminlog() {
                     localStorage.setItem('accessToken', res.data.accessToken);
                     localStorage.setItem('user', JSON.stringify(res.data.user));
                     setUser(res.data.user);
-                    toast.success('Admin logged in',{ autoClose: 3000 });
-                    navigate('/admin');
+
+                    toast.success('Admin logged in', { autoClose: 3000 });
+
+                    // Delay navigation slightly to let toast show
+                    setTimeout(() => {
+                        navigate('/admin');
+                    }, 500); // 0.5 seconds
                 })
                 .catch((err) => {
                     toast.error(err?.response?.data?.message || 'Login failed', { autoClose: 3000 });

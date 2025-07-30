@@ -36,7 +36,7 @@ function Admin() {
   const [constructiveReviews, setConstructiveReviews] = useState([]);
   useEffect(() => {
     if (activeSection === 'Users') {
-      http.get('/user')
+      http.get('/user?includeDeleted=true')
         .then((res) => setUsers(res.data))
         .catch((err) => console.error('Failed to load users', err));
     } else if (activeSection === 'Email Filters') {
@@ -106,76 +106,108 @@ function Admin() {
       case 'Dashboard':
         return <ReviewAdmin />;
       case 'Users':
-        return (
-          <>
-            <Typography variant="h5" mb={2}>User List</Typography>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Created At</TableCell>
-                  <TableCell>Password</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.id}</TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell style={{
-                      fontWeight: 'bold',
-                      color: user.role === 'admin' ? 'red' : 'black'
+  return (
+    <>
+      <Typography variant="h5" mb={2}>User List</Typography>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>ID</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Role</TableCell>
+            <TableCell>Created At</TableCell>
+            <TableCell>Actions</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {users.map((user) => (
+            <TableRow
+              key={user.id}
+              sx={user.deletedAt ? {
+                color: 'gray',
+                '& td': {
+                  color: 'gray',
+                  textDecoration: 'line-through',
+                  opacity: 0.6
+                }
+              } : {}}
+            >
+              <TableCell>{user.id}</TableCell>
+              <TableCell>{user.name}</TableCell>
+              <TableCell>{user.email}</TableCell>
+              <TableCell style={{
+                fontWeight: 'bold',
+                color: user.role === 'admin' ? 'red' : 'black'
+              }}>
+                {user.role === 'admin' ? 'Admin' : 'User'}
+              </TableCell>
+              <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
+              <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                {user.deletedAt ? (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={async () => {
+                      try {
+                        await http.post(`/user/restore/${user.id}`);
+                        toast.success("User restored");
+                        setUsers(users.map(u => u.id === user.id ? { ...u, deletedAt: null } : u));
+                      } catch (err) {
+                        toast.error("Failed to restore user");
+                        console.error(err);
+                      }
+                    }}
+                  >
+                    Restore
+                  </Button>
+                ) : (
+                  <>
+                    <Button size="small" variant="outlined" onClick={() => {
+                      setSelectedUser(user);
+                      setEditUserData({
+                        name: user.name,
+                        email: user.email,
+                        role: user.role
+                      });
+                      setEditUserDialogOpen(true);
                     }}>
-                      {user.role === 'admin' ? 'Admin' : 'User'}
-                    </TableCell>
-                    <TableCell>{new Date(user.createdAt).toLocaleString()}</TableCell>
-                    <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box sx={{
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        maxWidth: '150px'
-                      }}>
-                        {visiblePasswords[user.id]
-                          ? user.password
-                          : '•'.repeat(user.password.length)}
-                      </Box>
-                      <IconButton onClick={() => togglePassword(user.id)}>
-                        {visiblePasswords[user.id] ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                      <Button size="small" variant="outlined" onClick={() => {
-                        setSelectedUser(user);
-                        setEditUserData({
-                          name: user.name,
-                          email: user.email,
-                          password: user.password,
-                          role: user.role
-                        });
-                        setEditUserDialogOpen(true);
-                      }}>Edit</Button>
-                      <Button size="small" color="error" variant="outlined" onClick={async () => {
+                      Edit
+                    </Button>
+                    <Button
+                      size="small"
+                      color="error"
+                      variant="outlined"
+                      onClick={async () => {
                         if (window.confirm(`Are you sure to delete ${user.email}?`)) {
                           try {
                             await http.delete(`/user/${user.id}`);
-                            setUsers(users.filter(u => u.id !== user.id));
+                            setUsers(users.map(u =>
+                              u.id === user.id
+                                ? { ...u, deletedAt: new Date().toISOString() }
+                                : u
+                            ));
                             toast.success("User deleted successfully", { autoClose: 3000 });
                           } catch (err) {
                             toast.error("Failed to delete user");
                             console.error(err);
                           }
                         }
-                      }}>Delete</Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </>
-        );
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
+  );
+
+
       case 'Reports':
         return <Typography variant="h5">Reports</Typography>;
       case 'Settings':

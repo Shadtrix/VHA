@@ -5,32 +5,15 @@ import * as yup from 'yup';
 import http from '../http';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Person, Lock, Email } from '@mui/icons-material';
+import { Person, Lock, Email, Visibility, VisibilityOff } from '@mui/icons-material';
 import { generateAIPassword } from '../utils/generatePassword';
 import { useState } from 'react';
+import { getAIRole } from '../utils/getAIRole';
 
 function Register() {
   const navigate = useNavigate();
-
-  // AI Role Suggestion Simulation
-  const [emailToCheck, setEmailToCheck] = useState('');
-  const [aiSuggestedRole, setAiSuggestedRole] = useState('');
-
-  const handleAISimulate = () => {
-    const trimmedEmail = emailToCheck.trim().toLowerCase();
-
-    if (trimmedEmail === '') {
-      setAiSuggestedRole('');
-      toast.warn("Please enter an email first.",{ autoClose: 3000 });
-      return;
-    }
-
-    if (trimmedEmail.endsWith('@vha.com')) {
-      setAiSuggestedRole('admin');
-    } else {
-      setAiSuggestedRole('user');
-    }
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -58,10 +41,15 @@ function Register() {
         .required('Confirm password is required')
         .oneOf([yup.ref('password')], 'Passwords must match')
     }),
-    onSubmit: (data) => {
+    onSubmit: async (data) => {
       data.name = data.name.trim();
       data.email = data.email.trim().toLowerCase();
       data.password = data.password.trim();
+
+      // Get role from GenAI
+      const aiRole = await getAIRole(data.email);
+      console.log("Claude role response:", aiRole); // <-- add this line
+      data.role = aiRole || "user";
 
       http.post("/user/register", data)
         .then(() => navigate("/login"))
@@ -73,12 +61,33 @@ function Register() {
 
   const handleSuggestPassword = async () => {
     try {
-      const aiPassword = await generateAIPassword();
-      if (aiPassword) {
-        formik.setFieldValue("password", aiPassword);
-        formik.setFieldValue("confirmPassword", aiPassword);
-        toast.info("AI-suggested password inserted.");
+      let aiPassword = null;
+      let attempts = 0;
+
+      while (attempts < 3) {
+        const generated = await generateAIPassword();
+        if (!generated) break;
+
+        const trimmed = generated.trim().slice(0, 50);
+        const hasLetter = /[a-zA-Z]/.test(trimmed);
+        const hasNumber = /[0-9]/.test(trimmed);
+
+        if (hasLetter && hasNumber) {
+          aiPassword = trimmed;
+          break;
+        }
+
+        attempts++;
       }
+
+      if (!aiPassword) {
+        toast.error("AI failed to generate a valid password after 3 tries.");
+        return;
+      }
+
+      formik.setFieldValue("password", aiPassword);
+      formik.setFieldValue("confirmPassword", aiPassword);
+      toast.info("AI-suggested password inserted.");
     } catch (err) {
       toast.error("Failed to generate password");
     }
@@ -93,7 +102,6 @@ function Register() {
       overflow: 'visible',
       backgroundColor: '#f9f9f9'
     }}>
-      
       <Box sx={{
         width: '50%',
         maxWidth: '500px',
@@ -107,37 +115,6 @@ function Register() {
           Sign up now
         </Typography>
 
-       
-        <Box sx={{ mt: 3, p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
-          <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-            AI Role Suggestion (Based on Email)
-          </Typography>
-
-          <TextField
-            fullWidth
-            label="Email Address"
-            value={emailToCheck}
-            onChange={(e) => setEmailToCheck(e.target.value)}
-            placeholder="e.g. john@vha.com"
-            sx={{ mb: 2 }}
-          />
-
-          <Button
-            variant="outlined"
-            onClick={handleAISimulate}
-            sx={{ textTransform: 'none' }}
-          >
-            Ask AI: What Role Should This Be?
-          </Button>
-
-          {aiSuggestedRole && (
-            <Typography mt={2}>
-              🔍 <strong>Suggested Role:</strong> {aiSuggestedRole === 'admin' ? 'Admin' : 'User'}
-            </Typography>
-          )}
-        </Box>
-
-        
         <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 3 }}>
           <TextField
             fullWidth margin="dense" label="Name" name="name"
@@ -170,7 +147,8 @@ function Register() {
             }}
           />
           <TextField
-            fullWidth margin="dense" label="Password" type="password" name="password"
+            fullWidth margin="dense" label="Password"
+            type={showPassword ? "text" : "password"} name="password"
             value={formik.values.password}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -182,11 +160,17 @@ function Register() {
                   <Lock />
                 </InputAdornment>
               ),
+              endAdornment: (
+                <InputAdornment position="end" sx={{ cursor: "pointer" }} onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </InputAdornment>
+              )
             }}
           />
 
           <TextField
-            fullWidth margin="dense" label="Confirm Password" type="password" name="confirmPassword"
+            fullWidth margin="dense" label="Confirm Password"
+            type={showConfirmPassword ? "text" : "password"} name="confirmPassword"
             value={formik.values.confirmPassword}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
@@ -198,6 +182,11 @@ function Register() {
                   <Lock />
                 </InputAdornment>
               ),
+              endAdornment: (
+                <InputAdornment position="end" sx={{ cursor: "pointer" }} onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                </InputAdornment>
+              )
             }}
           />
 
@@ -224,7 +213,6 @@ function Register() {
           </Typography>
         </Box>
 
-        
         <Box mt={2} textAlign="center">
           <Button
             size="small"
@@ -245,7 +233,6 @@ function Register() {
         <ToastContainer />
       </Box>
 
-      
       <Box sx={{
         width: '50%',
         flexShrink: 1,
