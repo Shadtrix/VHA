@@ -58,7 +58,6 @@ const handleGenerateResponse = async () => {
 };
 
 
-
   if (loading) return <Typography align="center">Loading email...</Typography>;
   if (!email) return <Typography align="center">Email not found.</Typography>;
 
