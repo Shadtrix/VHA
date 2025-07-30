@@ -51,12 +51,12 @@ function Admin() {
         .then(([logsRes, reviewsRes]) => {
           const logs = logsRes.data.filter(r => r.constructive);
           const reviews = reviewsRes.data;
-          // Merge logs with review details
           const merged = logs.map(log => {
             const review = reviews.find(r => r.id === log.reviewId);
             return {
               ...log,
-              ...review
+              ...review,
+              reason: log.reason || review?.reason || "No reason provided"
             };
           });
           setConstructiveReviews(merged);

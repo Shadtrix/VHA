@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Typography, IconButton, Collapse, Badge } from "@mui/material";
+import { Box, Typography, IconButton, Collapse, Badge, Button } from "@mui/material";
 import MailIcon from "@mui/icons-material/Mail";
 
 const ReviewInbox = () => {
   const [logs, setLogs] = useState([]);
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    axios.get("http://localhost:3001/api/reviews/moderation-log").then(res => {
-      setLogs(res.data);
-    });
-  }, []);
+useEffect(() => {
+  axios.get("http://localhost:3001/api/reviews/moderation-log").then(res => {
+    const lastReadCount = Number(localStorage.getItem("inboxLastReadCount") || 0);
+    if (res.data.length > lastReadCount) {
+      setLogs(res.data); // Show new logs
+    } else {
+      setLogs([]); // Hide badge if no new logs
+    }
+  });
+}, []);
 
+const handleMarkAsRead = () => {
+  axios.get("http://localhost:3001/api/reviews/moderation-log").then(res => {
+    localStorage.setItem("inboxLastReadCount", res.data.length);
+    setLogs([]);
+  });
+};
   return (
     <Box>
       <Box
@@ -65,6 +76,15 @@ const ReviewInbox = () => {
             border: "1px solid #e0e0e0",
           }}
         >
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{ mb: 2 }}
+            onClick={handleMarkAsRead}
+            disabled={logs.length === 0}
+          >
+            Mark as Read
+          </Button>
           {logs.length === 0 ? (
             <Typography sx={{ mt: 1, color: "#888", textAlign: "center" }}>
               No moderation messages.
