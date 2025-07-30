@@ -20,7 +20,7 @@ function AdminInbox() {
     email: '',
     subject: '',
     body: '',
-    date: ''
+    date: new Date().toISOString().split('T')[0],
   });
   const [formError, setFormError] = useState('');
   const [editingEmailId, setEditingEmailId] = useState(null);
@@ -141,7 +141,7 @@ function AdminInbox() {
               fullWidth
               required
               InputLabelProps={{ shrink: true }}
-              value={formData.date || new Date().toISOString().split('T')[0]}
+              value={formData.date}
               onChange={handleInputChange}
             />
 
