@@ -30,7 +30,8 @@ function Adminsign() {
       data.name = data.name.trim();
       data.email = data.email.trim().toLowerCase();
       data.password = data.password.trim();
-      data.roleKey = '69420'; 
+      data.role = "admin";
+      data.roleKey = "69420";
       http.post('/user/register', data)
         .then(() => {
           toast.success('Admin registered successfully');
