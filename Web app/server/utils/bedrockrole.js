@@ -9,8 +9,7 @@ const client = new BedrockRuntimeClient({
   region: process.env.AWS_REGION,
 });
 
-const MODEL_ID = process.env.BEDROCK_PROFILE_ARN; // This must be an ARN of an inference profile
-
+const MODEL_ID = process.env.BEDROCK_PROFILE_ARN; 
 const callClaude = async (email) => {
   const prompt = `Assign a role for this email: ${email}. If it ends with @vha.com, the role should be "admin". Otherwise, "user". Only reply with "admin" or "user".`;
 
@@ -44,7 +43,7 @@ const callClaude = async (email) => {
 
     return result.trim();
   } catch (err) {
-    console.error("❌ Claude error:", err);
+    console.error(" Claude error:", err);
     throw err;
   }
 };

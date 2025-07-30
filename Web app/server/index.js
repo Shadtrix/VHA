@@ -4,20 +4,19 @@ const cors = require('cors');
 
 const app = express();
 
-// Enable CORS for frontend
+
 app.use(cors({
   origin: process.env.CLIENT_URL || "http://localhost:5173"
 }));
 
-// Middleware to parse incoming JSON
+
 app.use(express.json());
 
-// Simple base route
+
 app.get("/", (req, res) => {
   res.send("Welcome to VHA.");
 });
 
-// API Routes
 const tutorialRoute = require('./routes/tutorial');
 app.use("/tutorial", tutorialRoute);
 
@@ -36,7 +35,10 @@ app.use('/categories', categoryRoutes);
 const aiRoutes = require('./routes/ai');
 app.use('/api/ai', aiRoutes);
 
-// Sequelize DB Connection
+const chatbotRoute = require("./routes/chatbot");
+app.use("/api/chatbot", chatbotRoute);
+
+
 const db = require('./models');
 db.sequelize.sync({ force: false, alter: false })
   .then(() => {

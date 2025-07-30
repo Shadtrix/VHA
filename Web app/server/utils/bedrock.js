@@ -11,7 +11,7 @@ const bedrock = new BedrockRuntimeClient({
 
 async function callClaude(prompt) {
   const command = new InvokeModelWithResponseStreamCommand({
-    modelId: process.env.BEDROCK_PROFILE_ARN, // ✅ should be modelId
+    modelId: process.env.BEDROCK_PROFILE_ARN, 
     contentType: "application/json",
     accept: "application/json",
     body: JSON.stringify({
@@ -34,7 +34,7 @@ async function callClaude(prompt) {
 
     return result.trim();
   } catch (err) {
-    console.error("❌ AWS Bedrock error:", err);
+    console.error(" AWS Bedrock error:", err);
     throw err;
   }
 }

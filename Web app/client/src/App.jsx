@@ -1,8 +1,21 @@
 import './App.css';
-import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Box, Container } from '@mui/material';
+import './components/chatbot.css'; // ✅ Chatbot CSS import
+
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  Box,
+  Container
+} from '@mui/material';
+
 import { AccountCircle, ArrowDropDown } from '@mui/icons-material';
 import { useState, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
 import Tutorials from './pages/Tutorials';
 import Rating from './pages/Rating';
 import Register from './pages/Register';
@@ -20,8 +33,9 @@ import AdminInbox from './pages/AdminInbox';
 import EmailContent from './pages/EmailContent';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-
+import ChatbotWidget from './components/ChatbotWidget'; // ✅ Chatbot component
 import UserContext from './contexts/UserContext';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -115,11 +129,14 @@ function AppContent() {
             <Route path="/admin" element={<Admin />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-
           </Routes>
         </Container>
       </Box>
+
       <ToastContainer autoClose={3000} hideProgressBar={false} />
+
+      {}
+      <ChatbotWidget />
     </>
   );
 }
