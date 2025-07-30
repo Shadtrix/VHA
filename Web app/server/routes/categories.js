@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../models');
 const Category = db.Category;
 const { reclassifyAllEmails } = require('../utils/classifyEmail');
+const Email = db.Email;
 
 // GET all categories
 router.get('/', async (req, res) => {
@@ -84,6 +85,18 @@ router.post('/classify', async (req, res) => {
   } catch (err) {
     console.error("Classify error:", err); // <-- Add this
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.get('/by-category/:id', async (req, res) => {
+  try {
+    const emails = await Email.findAll({
+      where: { category_id: req.params.id }
+    });
+    res.json(emails);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch emails by category' });
   }
 });
 

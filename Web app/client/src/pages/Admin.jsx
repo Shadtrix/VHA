@@ -34,6 +34,7 @@ function Admin() {
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [selectedChips, setSelectedChips] = useState([]);
   const [constructiveReviews, setConstructiveReviews] = useState([]);
+  const [filteredEmails, setFilteredEmails] = useState([]);
   useEffect(() => {
     if (activeSection === 'Users') {
       http.get('/user?includeDeleted=true')
@@ -375,6 +376,31 @@ function Admin() {
                   ))}
                 </TableBody>
               </Table>
+              {filteredEmails.length > 0 && (
+                <Box mt={4}>
+                  <Typography variant="h6" gutterBottom>Filtered Emails</Typography>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Subject</TableCell>
+                        <TableCell>Sender</TableCell>
+                        <TableCell>Date</TableCell>
+                        <TableCell>Category ID</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {filteredEmails.map(email => (
+                        <TableRow key={email.id}>
+                          <TableCell>{email.subject}</TableCell>
+                          <TableCell>{email.sender} ({email.email})</TableCell>
+                          <TableCell>{new Date(email.date).toLocaleString()}</TableCell>
+                          <TableCell>{email.category_id}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
+              )}
             </Box>
 
             <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
@@ -422,10 +448,28 @@ function Admin() {
                 <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                   <Button onClick={() => setSelectedChips(categories.map(c => c.name))}>Select all</Button>
                   <Button onClick={() => setSelectedChips([])}>Clear</Button>
-                  <Button variant="contained" onClick={() => {
-                    toast.success(`Applied filters: ${selectedChips.join(', ') || 'None'}`);
-                    setFilterModalOpen(false);
-                  }}>
+                  <Button
+                    variant="contained"
+                    onClick={async () => {
+                      try {
+                        const chipNames = selectedChips;
+                        const selected = categories.filter(c => chipNames.includes(c.name));
+                        const results = [];
+
+                        for (const category of selected) {
+                          const res = await http.get(`/categories/by-category/${category.id}`);
+                          results.push(...res.data);
+                        }
+
+                        setFilteredEmails(results);
+                        toast.success(`Applied filters: ${chipNames.join(', ') || 'None'}`);
+                        setFilterModalOpen(false);
+                      } catch (err) {
+                        toast.error("Failed to fetch filtered emails");
+                        console.error(err);
+                      }
+                    }}
+                  >
                     Apply filters
                   </Button>
                 </Box>
