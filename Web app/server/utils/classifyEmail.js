@@ -104,7 +104,7 @@ async function reclassifyAllEmails() {
             }
           }
 
-          console.log(`✅ Email ${email.id} classified as: [${filteredCategoryIds.join(", ")}], primary: ${primaryCategoryId}`);
+          console.log(`✅ Email ${email.id} classified as: [${filteredCategoryIds.join(", ")}]`);
         } else {
           console.warn(`⚠️ Email ${email.id} returned no valid category IDs.`);
         }

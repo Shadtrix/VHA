@@ -230,7 +230,7 @@ function AdminInbox() {
                   <DeleteIcon />
                 </IconButton>
 
-                {(!email.translated && !email.summarised && !email.autoResponse) && (
+                {(!email.translated && !email.summarised) && (
                   <IconButton
                     edge="end"
                     aria-label="update"
