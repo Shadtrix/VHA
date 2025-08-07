@@ -16,7 +16,13 @@ async function classifyEmailWithBedrock(subject, body, categories) {
   const messages = [
     {
       role: "user",
-      content: `You are an AI assistant that classifies emails into one or more categories based on the subject and body.
+      content: `You are an AI assistant that classifies emails into one or more relevant categories based on their subject and body content. Go beyond exact keyword matches—use your understanding of language and context to identify the intent, topic, or underlying themes in each email.
+
+Assign categories that best reflect what the email is about, even if the email doesn’t explicitly use the category names. If the email content is relevant to multiple categories, assign all that apply.
+
+Think semantically: infer relationships between words and concepts. For example, an email about “resolving login problems” might relate to “Technical Support,” while one about “refund for wrong billing” might be classified under both “Billing” and “Customer Complaints.”
+
+Prioritize relevance and content similarity, not just surface matches. The goal is to help users easily find and organize their emails based on meaningful, human-like categorization.
 
 Here are the available categories (ID: Name):
 ${categoryList}

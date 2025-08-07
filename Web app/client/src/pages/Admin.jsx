@@ -16,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import { Chip, InputAdornment } from '@mui/material';
 import { TableContainer } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function Admin() {
   const [activeSection, setActiveSection] = useState('Dashboard');
@@ -35,6 +36,8 @@ function Admin() {
   const [selectedChips, setSelectedChips] = useState([]);
   const [constructiveReviews, setConstructiveReviews] = useState([]);
   const [filteredEmails, setFilteredEmails] = useState([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (activeSection === 'Users') {
       const endpoint = showDeletedOnly ? '/user/deleted' : '/user';
@@ -393,21 +396,36 @@ function Admin() {
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell>Subject</TableCell>
                         <TableCell>Sender</TableCell>
+                        <TableCell>Subject</TableCell>
                         <TableCell>Date</TableCell>
-                        <TableCell>Category ID</TableCell>
+                        <TableCell>Categories</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {filteredEmails.map(email => (
                         <TableRow key={email.id}>
-                          <TableCell>{email.subject}</TableCell>
                           <TableCell>{email.sender} ({email.email})</TableCell>
+                          <TableCell
+                            sx={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+                            onClick={() => window.open(`/email/${email.id}`, '_blank')}
+                          >
+                            {email.subject}
+                          </TableCell>
+
                           <TableCell>{new Date(email.date).toLocaleString()}</TableCell>
                           <TableCell>
-                            {email.category_ids ? email.category_ids.join(', ') : email.category_id}
+                            {email.category_ids
+                              ? email.category_ids.map(id => {
+                                const match = categories.find(cat => cat.id === id);
+                                return match ? match.name : id;
+                              }).join(', ')
+                              : (
+                                categories.find(cat => cat.id === email.category_id)?.name || email.category_id
+                              )
+                            }
                           </TableCell>
+
                         </TableRow>
                       ))}
                     </TableBody>
