@@ -15,18 +15,16 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <Box>
-
-      {/* ===== Hero with background image ===== */}
       <Box
         sx={{
           position: 'relative',
           minHeight: { xs: 360, md: 460 },
-          // Vite-safe public path (works in dev and when deployed under a subpath)
-          backgroundImage: `url(${import.meta.env.BASE_URL}backgroundimg.png)`,
+          backgroundImage: 'url(/backgroundimg.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          color: 'white',
+          backgroundAttachment: 'fixed', // Optional
+          color: 'black',
           display: 'flex',
           alignItems: 'center',
           textAlign: 'center',
@@ -34,14 +32,6 @@ function Home() {
           px: 2
         }}
       >
-        {/* Overlay */}
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.45)'
-          }}
-        />
 
         {/* Content */}
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
