@@ -16,6 +16,7 @@ import { AccountCircle, ArrowDropDown } from '@mui/icons-material';
 import { useState, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
+import Home from './pages/Home';
 import Tutorials from './pages/Tutorials';
 import Rating from './pages/Rating';
 import Register from './pages/Register';
@@ -112,7 +113,8 @@ function AppContent() {
       <Box sx={{ mt: '64px' }}>
         <Container>
           <Routes>
-            <Route path="/home" element={<Tutorials />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/reviews" element={<Tutorials />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
@@ -145,7 +147,7 @@ function AppContent() {
 function App() {
   return (
     <ChatbotProvider>
-      <Router>
+      <Router basename={import.meta.env.BASE_URL}>
         <AppContent />
       </Router>
     </ChatbotProvider>
