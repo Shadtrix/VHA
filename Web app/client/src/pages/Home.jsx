@@ -14,31 +14,42 @@ import { Link } from 'react-router-dom';
 
 function Home() {
   return (
-    <Box>
+    <>
       <Box
         sx={{
           position: 'relative',
-          minHeight: { xs: 360, md: 460 },
+          width: '100vw',
+          minHeight: '100svh',
+          left: '50%',
+          right: '50%',
+          marginLeft: '-50vw',
+          marginRight: '-50vw',
           backgroundImage: 'url(/backgroundimg.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed', // Optional
-          color: 'black',
+          backgroundAttachment: 'fixed',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center',
           textAlign: 'center',
-          py: { xs: 8, md: 10 },
-          px: 2
+          color: 'black',
+          overflow: 'hidden',
         }}
       >
-
-        {/* Content */}
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+        <Container
+          maxWidth="lg"
+          disableGutters
+          sx={{ position: 'relative', zIndex: 1, px: { xs: 2, sm: 3 } }}
+        >
           <Typography variant="h3" fontWeight={800} gutterBottom>
             Engineering safety & compliance, done right.
           </Typography>
-          <Typography variant="h6" sx={{ opacity: 0.95, maxWidth: 900, mx: 'auto', mb: 3 }}>
+
+          <Typography
+            variant="h6"
+            sx={{ opacity: 0.95, maxWidth: 900, mx: 'auto', mb: 3 }}
+          >
             VHA delivers Fire Safety, MEP Engineering, and Annual Fire Certification services
             with precision, speed, and audit-ready documentation.
           </Typography>
@@ -47,6 +58,7 @@ function Home() {
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
             justifyContent="center"
+            alignItems="center"
             sx={{ mt: 2 }}
           >
             <Button
@@ -203,7 +215,7 @@ function Home() {
           </Grid>
         </Grid>
       </Container>
-    </Box>
+    </>
   );
 }
 
