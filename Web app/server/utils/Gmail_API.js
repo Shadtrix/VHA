@@ -1,23 +1,21 @@
-// GmailAPI.js
+require('dotenv').config();
 const { google } = require("googleapis");
 
-// Create an OAuth2 client
+
 const auth = new google.auth.OAuth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
   process.env.REDIRECT_URI
 );
 
-// Set refresh token (so backend can fetch without manual login every time)
 auth.setCredentials({
-  refresh_token: process.env.REFRESH_TOKEN,
+  refresh_token: process.env.REFRESH_TOKEN
 });
+
+console.log("Current refresh token:", auth.credentials.refresh_token);
 
 const gmail = google.gmail({ version: "v1", auth });
 
-/**
- * Fetch a list of recent emails for the linked account
- */
 async function listEmails() {
   const res = await gmail.users.messages.list({
     userId: "me", // "me" means the authenticated account (vhaengineeringconsultants@gmail.com)
@@ -54,5 +52,20 @@ async function listEmails() {
 
   return emails;
 }
+async function deleteEmail(emailId) {
+  try {
+    await gmail.users.messages.delete({ userId: "me", id: emailId });
+    console.log("Email deleted successfully");
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+  }
+}
 
-module.exports = { listEmails };
+async function sendEmail(rawMessage) {
+  await gmail.users.messages.send({
+    userId: "me",
+    requestBody: { raw: rawMessage },
+  });
+}
+
+module.exports = { listEmails, deleteEmail, sendEmail };

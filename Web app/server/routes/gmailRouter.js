@@ -53,4 +53,18 @@ router.get("/messages", async (req, res) => {
   }
 });
 
+router.delete("/messages/:id", async (req, res) => {
+  const gmailId = req.params.id;
+  try {
+    await gmail.users.messages.delete({
+      userId: "me",
+      id: gmailId,
+    });
+    res.json({ success: true, message: "Email deleted" });
+  } catch (err) {
+    console.error("Failed to delete Gmail email:", err);
+    res.status(500).json({ error: "Failed to delete Gmail email" });
+  }
+});
+
 module.exports = router;

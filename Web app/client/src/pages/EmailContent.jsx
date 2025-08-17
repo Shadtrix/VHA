@@ -18,17 +18,21 @@ function EmailContent() {
   const navigate = useNavigate();
 
 
-  useEffect(() => {
-    axios.get(`http://localhost:3001/api/email/${id}`)
-      .then(res => {
-        setEmail(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, [id]);
+useEffect(() => {
+  const fetchEmail = async () => {
+    try {
+      const res = await axios.get(`http://localhost:3001/api/email/${id}`);
+      setEmail(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching email:", err);
+      setLoading(false);
+    }
+  };
+
+  fetchEmail();
+}, [id]);
+
 
 const handleTranslate = async () => {
   try {

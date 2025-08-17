@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true
     },
+    gmailId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     sender: {
       type: DataTypes.STRING,
       allowNull: false,
