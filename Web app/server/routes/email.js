@@ -2,17 +2,38 @@ const express = require("express");
 const router = express.Router();
 const { callClaude } = require ("../utils/claude.js");
 const { Email } = require("../models");
+const { listEmails } = require("../utils/Gmail_API.js");
 
 
 router.get('/', async (req, res) => {
   try {
-    const emails = await Email.findAll();
-    res.json(emails);
+    const dbEmails = await Email.findAll();
+
+    const gmailEmails = await listEmails();
+
+    const mappedGmailEmails = gmailEmails.map((e) => ({
+      id: e.id,
+      sender: e.from,
+      email: e.from,
+      subject: e.subject,
+      body: e.body,
+      date: new Date(e.date),
+      translated: false,
+      summarised: false,
+      autoResponse: false,
+    }));
+
+    const allEmails = [...dbEmails, ...mappedGmailEmails];
+
+    allEmails.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    res.json(allEmails);
   } catch (err) {
-    console.error("Failed to fetch emails:", err);
+    console.error("Failed to fetch combined emails:", err);
     res.status(500).json({ error: "Failed to fetch emails" });
   }
 });
+
 
 router.get('/:id', async (req, res) => {
   try {

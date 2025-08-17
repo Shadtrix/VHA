@@ -50,3 +50,12 @@ db.sequelize.sync({ force: false, alter: false })
   .catch((err) => {
     console.error(" Failed to sync database:", err);
   });
+
+  const gmailRouter = require("./routes/gmailRouter");
+
+  app.use("/api/gmail", gmailRouter);
+
+const emailRouter = require("./routes/email");
+app.use("/api/email", emailRouter);
+
+app.listen(3001, () => console.log("Server running on http://localhost:3001"));
