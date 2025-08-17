@@ -24,6 +24,7 @@
     "openai": "^5.8.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^7.6.2",
     "react-slick": "^0.30.3",
     "react-toastify": "^11.0.5",

@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1",
     "openai": "^5.8.2",
+    "react-responsive-carousel": "^3.2.23",
     "sequelize": "^6.37.7",
     "yup": "^1.6.1"
   },

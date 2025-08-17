@@ -3,3 +3,11 @@ color: inherit;
 text-decoration: none;
 margin-right: 16px;
 }
+
+.hero-carousel { width: 100%; }
+.hero-slide {
+  width: 100%;
+  display: block;
+  aspect-ratio: 16 / 6; /* adjust height as you like (e.g., 16/7 or 21/9) */
+  object-fit: cover;
+}

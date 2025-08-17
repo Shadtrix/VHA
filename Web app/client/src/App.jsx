@@ -37,6 +37,10 @@ import {
 
 import { createTheme, ThemeProvider, alpha } from '@mui/material/styles';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
+import { Carousel } from 'react-responsive-carousel';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+
+
 import Home from './pages/Home';
 import Tutorials from './pages/Tutorials';
 import Rating from './pages/Rating';
@@ -197,7 +201,7 @@ function AppContent() {
                     Services
                   </Button>
                   <Menu anchorEl={servicesEl} open={Boolean(servicesEl)} onClose={closeServices}
-                        slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
+                    slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
                     <MenuItem onClick={closeServices} component={RouterLink} to="/mechanicalelectricalplumbing">
                       Mechanical, Electrical & Plumbing
                     </MenuItem>
@@ -251,7 +255,7 @@ function AppContent() {
                   {user ? user.name : 'Account'}
                 </Button>
                 <Menu anchorEl={accountEl} open={Boolean(accountEl)} onClose={closeAccount}
-                      slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
+                  slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
                   {!user ? (
                     <>
                       <MenuItem onClick={closeAccount} component={RouterLink} to="/register">Register</MenuItem>
@@ -367,11 +371,10 @@ function AppContent() {
             pb: 5
           }}
         >
-          {/* Optional hero band for extra style */}
           <Box
             sx={{
               background: `radial-gradient(1000px 500px at 10% -10%, ${alpha(theme.palette.secondary.main, 0.25)}, transparent 60%),
-                           radial-gradient(1000px 500px at 90% -10%, ${alpha(theme.palette.primary.main, 0.25)}, transparent 60%)`,
+                 radial-gradient(1000px 500px at 90% -10%, ${alpha(theme.palette.primary.main, 0.25)}, transparent 60%)`,
               py: { xs: 4, md: 6 },
               mb: 2
             }}
@@ -383,6 +386,11 @@ function AppContent() {
               <Typography mt={1} color="text.secondary">
                 Engineering & fire safety services for modern facilities.
               </Typography>
+
+              <Carousel autoPlay infiniteLoop>
+                <div><img src="/backgroundimg.png" /><p className="legend">First slide</p></div>
+                <div><img src="/VHA.png" /><p className="legend">Second slide</p></div>
+              </Carousel>
             </Container>
           </Box>
 
