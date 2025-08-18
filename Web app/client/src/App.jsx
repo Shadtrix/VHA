@@ -30,6 +30,7 @@ import AdminInbox from './pages/AdminInbox';
 import EmailContent from './pages/EmailContent';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import Profile from './pages/Profile';
 
 import ChatbotWidget from './components/ChatbotWidget';
 import UserContext from './contexts/UserContext';
@@ -119,6 +120,8 @@ const NavBtn = ({ to, children }) => (
   </Button>
 );
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
 function AppContent() {
   const { user, setUser } = React.useContext(UserContext);
   const location = useLocation();
@@ -144,6 +147,12 @@ function AppContent() {
 
   const initials =
     user?.name?.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() || 'AC';
+
+  const resolveAvatar = (url) => {
+    if (!url) return null;
+    return /^https?:\/\//i.test(url) ? url : API_BASE + url; // turn /uploads/... into absolute URL
+  };
+  const avatarSrc = user?.avatarUrl ? resolveAvatar(user.avatarUrl) : null;
 
   return (
     <>
@@ -203,6 +212,7 @@ function AppContent() {
                   startIcon={
                     user ? (
                       <Avatar
+                        src={avatarSrc || undefined}
                         sx={{
                           width: 28,
                           height: 28,
@@ -212,7 +222,7 @@ function AppContent() {
                           border: '1px solid rgba(255,255,255,.35)'
                         }}
                       >
-                        {initials}
+                        {!avatarSrc ? initials : null}
                       </Avatar>
                     ) : (
                       <AccountCircle />
@@ -243,7 +253,12 @@ function AppContent() {
                       </MenuItem>
                     </>
                   ) : (
-                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                    <>
+                      <MenuItem onClick={closeAccount} component={RouterLink} to="/profile">
+                        Profile
+                      </MenuItem>
+                      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                    </>
                   )}
                 </Menu>
 
@@ -264,7 +279,9 @@ function AppContent() {
           PaperProps={{ sx: { width: 300, p: 1.5, pb: 3, borderTopLeftRadius: 16, borderBottomLeftRadius: 16 } }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 1, py: 1 }}>
-            <Avatar sx={{ bgcolor: 'primary.main' }}>{initials}</Avatar>
+            <Avatar src={avatarSrc || undefined} sx={{ bgcolor: 'primary.main' }}>
+              {!avatarSrc ? initials : null}
+            </Avatar>
             <Typography fontWeight={700}>{user ? user.name : 'Guest'}</Typography>
           </Box>
           <Divider sx={{ mb: 1 }} />
@@ -309,6 +326,13 @@ function AppContent() {
               </ListItem>
             )}
             <Divider sx={{ my: 1 }} />
+            {user && (
+              <ListItem disablePadding>
+                <ListItemButton onClick={() => setDrawerOpen(false)} component={RouterLink} to="/profile">
+                  <ListItemText primary="Profile" />
+                </ListItemButton>
+              </ListItem>
+            )}
             {!user ? (
               <>
                 <ListItem disablePadding>
@@ -342,7 +366,7 @@ function AppContent() {
           </List>
         </Drawer>
 
-        {/* MAIN */}
+        
         <Box component="main" sx={{ flex: 1, pt: '84px', pb: 5 }}>
           <Box
             sx={{
@@ -360,7 +384,7 @@ function AppContent() {
                 Engineering & fire safety services for modern facilities.
               </Typography>
 
-              {/* Show carousel on Home routes only */}
+              
               {isHome && (
                 <Carousel autoPlay infiniteLoop>
                   <div>
@@ -397,11 +421,12 @@ function AppContent() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/rating" element={<Rating />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </Container>
         </Box>
 
-        {/* FOOTER */}
+        
         <Box
           component="footer"
           sx={{

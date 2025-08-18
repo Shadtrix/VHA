@@ -1,11 +1,21 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
 app.use(express.json());
+
+
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+const AVATARS_DIR = path.join(UPLOADS_DIR, 'avatars');
+fs.mkdirSync(AVATARS_DIR, { recursive: true });
+
+
+app.use('/uploads', express.static(UPLOADS_DIR));
 
 app.get('/', (req, res) => res.send('Welcome to VHA.'));
 
@@ -28,6 +38,8 @@ app.use('/api/chatbot',     chatbotRoute);
 app.use('/api/gmail',       gmailRouter);
 
 const db = require('./models');
+
+
 db.sequelize.sync({ force: false, alter: false })
   .then(() => {
     const port = process.env.APP_PORT || 8080; 

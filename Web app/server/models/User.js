@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
     resetCode: {
       type: DataTypes.STRING(10),
       allowNull: true
+    },
+    avatarUrl: {
+      type: DataTypes.STRING(1024),
+      allowNull: true
     }
   }, {
     tableName: 'users',

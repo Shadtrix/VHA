@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt'); 
 const { User } = require('../models');
 const yup = require("yup");
 const { sign } = require('jsonwebtoken');
@@ -9,6 +9,10 @@ require('dotenv').config();
 const { validateToken } = require('../middlewares/auth');
 const { callClaude } = require('../utils/bedrockrole');
 const nodemailer = require('nodemailer');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -20,9 +24,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-
 const RESET_INBOX = 'jackaryxeevan@gmail.com';
-
 
 const sendVerificationEmail = async (requesterEmail, code) => {
   const subject = 'VHA Password Reset Code';
@@ -47,6 +49,27 @@ const sendVerificationEmail = async (requesterEmail, code) => {
 
   console.log(`Reset code mailed to ${RESET_INBOX}. messageId=${info.messageId}`);
 };
+
+
+const AVATAR_DIR = path.join(__dirname, '..', 'uploads', 'avatars');
+fs.mkdirSync(AVATAR_DIR, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, AVATAR_DIR),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `${req.user.id}-${Date.now()}${ext}`);
+  }
+});
+const upload = multer({
+  storage,
+  fileFilter: (_req, file, cb) => {
+    const ok = /image\/(png|jpe?g|webp)/.test(file.mimetype);
+    cb(ok ? null : new Error('Invalid file type'), ok);
+  },
+  limits: { fileSize: 2 * 1024 * 1024 } 
+});
+
 
 router.post("/register", async (req, res) => {
   let data = req.body;
@@ -127,7 +150,8 @@ router.post("/login", async (req, res) => {
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role
+      role: user.role,
+      avatarUrl: user.avatarUrl || null
     };
 
     const accessToken = sign(userInfo, process.env.APP_SECRET, {
@@ -145,10 +169,73 @@ router.get("/auth", validateToken, (req, res) => {
     id: req.user.id,
     email: req.user.email,
     name: req.user.name,
-    role: req.user.role
+    role: req.user.role,
+    avatarUrl: req.user.avatarUrl || null
   };
   res.json({ user: userInfo });
 });
+
+
+router.get('/me', validateToken, async (req, res) => {
+  const u = await User.findByPk(req.user.id);
+  if (!u) return res.status(404).json({ message: 'User not found' });
+  res.json({
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    avatarUrl: u.avatarUrl || null
+  });
+});
+
+
+router.put('/me', validateToken, async (req, res) => {
+  const { name } = req.body || {};
+  const schema = yup.object({
+    name: yup.string().trim().min(3).max(50).required()
+      .matches(/^[a-zA-Z '-,.]+$/, "Name only allows letters, spaces and characters: ' - , .")
+  });
+  try {
+    await schema.validate({ name }, { abortEarly: false });
+    const u = await User.findByPk(req.user.id);
+    if (!u) return res.status(404).json({ message: 'User not found' });
+    u.name = name.trim();
+    await u.save();
+    res.json({ message: 'Profile updated' });
+  } catch (e) {
+    res.status(400).json({ message: 'Invalid name', errors: e.errors });
+  }
+});
+
+
+router.post('/me/avatar', validateToken, upload.single('avatar'), async (req, res) => {
+  const u = await User.findByPk(req.user.id);
+  if (!u) return res.status(404).json({ message: 'User not found' });
+
+  const urlPath = `/uploads/avatars/${req.file.filename}`;
+  u.avatarUrl = urlPath;
+  await u.save();
+
+  res.json({ message: 'Avatar updated', avatarUrl: urlPath });
+});
+
+
+router.post('/change-password', validateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body || {};
+  if (!newPassword || !/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/.test(newPassword.trim())) {
+    return res.status(400).json({ message: 'Password must be at least 8 chars and include letters & numbers.' });
+  }
+  const u = await User.findByPk(req.user.id);
+  if (!u) return res.status(404).json({ message: 'User not found' });
+  if ((currentPassword || '').trim() !== u.password) {
+    return res.status(400).json({ message: 'Current password is incorrect.' });
+  }
+  u.password = newPassword.trim();
+  await u.save();
+  res.json({ message: 'Password changed' });
+});
+
+
 
 router.get("/", async (req, res) => {
   try {
@@ -252,7 +339,7 @@ router.post("/restore/:id", async (req, res) => {
     res.status(500).json({ message: "Failed to restore user" });
   }
 });
-// Verify reset code before allowing password change
+
 router.post("/verify-reset-code", async (req, res) => {
   const email = req.body.email?.trim().toLowerCase();
   const code = req.body.code?.trim();
