@@ -12,7 +12,16 @@ auth.setCredentials({
   refresh_token: process.env.REFRESH_TOKEN
 });
 
-console.log("Current refresh token:", auth.credentials.refresh_token);
+async function initAuth() {
+  try {
+    const { token } = await auth.getAccessToken();
+    console.log("✅ Access token obtained:", token ? "OK" : "Failed");
+  } catch (err) {
+    console.error("❌ Failed to refresh access token:", err);
+  }
+}
+
+initAuth();
 
 const gmail = google.gmail({ version: "v1", auth });
 

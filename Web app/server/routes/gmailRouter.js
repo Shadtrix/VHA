@@ -15,7 +15,6 @@ oAuth2Client.setCredentials({
 
 const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
 
-// Fetch messages
 router.get("/messages", async (req, res) => {
   try {
     const response = await gmail.users.messages.list({

@@ -46,9 +46,14 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const id = req.params.id;
 
+  // Helper to extract email from "Name <email@domain.com>"
+  const extractEmail = (str) => {
+    const match = str.match(/<(.+)>/);
+    return match ? match[1] : str;
+  };
+
   try {
     if (id.startsWith("gmail-")) {
-      // Gmail email
       const gmailId = id.replace(/^gmail-/, '');
       const gmail = google.gmail({ version: 'v1', auth });
 
@@ -61,11 +66,14 @@ router.get('/:id', async (req, res) => {
 
         const headers = gmailRes.data.payload.headers;
         const subject = headers.find(h => h.name === 'Subject')?.value || '(no subject)';
-        const from = headers.find(h => h.name === 'From')?.value || '';
+        const fromHeader = headers.find(h => h.name === 'From')?.value || '';
+        const toHeader = headers.find(h => h.name === 'To')?.value || '';
+        const senderEmail = extractEmail(fromHeader);
+        const recipientEmail = extractEmail(toHeader);
+
         const dateStr = headers.find(h => h.name === 'Date')?.value || '';
         const date = dateStr ? new Date(dateStr) : null;
 
-        // Extract body
         let body = '';
         const parts = gmailRes.data.payload.parts;
         if (parts && parts.length) {
@@ -83,14 +91,23 @@ router.get('/:id', async (req, res) => {
           body = gmailRes.data.snippet || '';
         }
 
-        return res.json({
-          id: `gmail-${gmailId}`,
-          gmailId,
-          sender: from,
-          subject,
-          body,
-          date,
-        });
+        // Save to DB if not already saved
+        let dbEmail = await Email.findOne({ where: { gmailId } });
+        if (!dbEmail) {
+          dbEmail = await Email.create({
+            gmailId,
+            sender: senderEmail,
+            email: recipientEmail,
+            subject,
+            body,
+            date,
+            translated: false,
+            summarised: false,
+            autoResponse: false,
+          });
+        }
+
+        return res.json(dbEmail);
 
       } catch (gmailErr) {
         console.error("Failed to fetch Gmail email:", gmailErr);
@@ -110,6 +127,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
 router.post('/create', async (req, res) => {
   try {
     const { sender, email, subject, body, date, translated, summarised, autoResponse } = req.body;
@@ -126,28 +144,32 @@ router.delete('/:id', async (req, res) => {
 
   try {
     if (id.startsWith("gmail-")) {
-      const gmailId = id.replace(/^gmail-/, "");
-      const gmail = google.gmail({ version: "v1", auth }); // use imported auth
+      // Gmail email
+      const gmailId = id.replace(/^gmail-/, '');
+      const gmail = google.gmail({ version: 'v1', auth });
 
-      console.log("Deleting Gmail email:", gmailId);
       await gmail.users.messages.delete({
-        userId: "me",
+        userId: 'me',
         id: gmailId,
       });
 
-      return res.json({ success: true, message: "Deleted from Gmail" });
+      return res.json({ message: "Gmail message deleted successfully" });
     } else {
-      const email = await Email.findByPk(id);
-      if (!email) return res.status(404).json({ error: "Email not found" });
+      // Database email
+      const deleted = await Email.destroy({ where: { id } });
 
-      await email.destroy();
-      return res.json({ success: true, message: "Deleted from DB" });
+      if (!deleted) {
+        return res.status(404).json({ error: "Email not found" });
+      }
+
+      return res.json({ message: "Database email deleted successfully" });
     }
   } catch (err) {
     console.error("Failed to delete email:", err);
-    return res.status(500).json({ error: "Failed to delete email" });
+    res.status(500).json({ error: "Failed to delete email" });
   }
 });
+
 
 router.put('/:id', async (req, res) => {
   try {
@@ -166,12 +188,43 @@ router.put('/:id', async (req, res) => {
 
 router.post("/translate/:id", async (req, res) => {
   try {
-    const email = await Email.findByPk(req.params.id);
-    if (!email) return res.status(404).json({ error: "Email not found" });
+    // 1️⃣ Try DB first
+    let email = await Email.findByPk(req.params.id);
 
+    // 2️⃣ If not in DB, fetch from Gmail API
+    if (!email) {
+      const gmail = google.gmail({ version: "v1", auth });
+
+      // ✅ Strip "gmail-" prefix before passing to Gmail
+      const gmailId = req.params.id.replace(/^gmail-/, "");
+
+      const gmailMsg = await gmail.users.messages.get({
+        userId: "me",
+        id: gmailId,
+      });
+
+      // Decode Gmail body (base64)
+      const bodyData = gmailMsg.data.payload.parts
+        ? gmailMsg.data.payload.parts.map(part => part.body.data).join("")
+        : gmailMsg.data.payload.body.data;
+
+      const body = Buffer.from(bodyData, "base64").toString("utf-8");
+
+      email = {
+        gmailId,
+        sender: gmailMsg.data.payload.headers.find(h => h.name === "From").value,
+        email: gmailMsg.data.payload.headers.find(h => h.name === "To").value,
+        subject: gmailMsg.data.payload.headers.find(h => h.name === "Subject").value,
+        body,
+      };
+    }
+
+    // 3️⃣ Call Claude for translation
     const translatedText = await callClaude(`Translate this email to English:\n\n${email.body}`);
 
+    // 4️⃣ Save only in DB (not Gmail)
     const newEmail = await Email.create({
+      gmailId: email.gmailId,
       sender: email.sender,
       email: email.email,
       subject: `[Translated] ${email.subject}`,
@@ -189,12 +242,38 @@ router.post("/translate/:id", async (req, res) => {
 
 router.post("/summarise/:id", async (req, res) => {
   try {
-    const email = await Email.findByPk(req.params.id);
-    if (!email) return res.status(404).json({ error: "Email not found" });
+    let email = await Email.findByPk(req.params.id);
+
+    if (!email) {
+      const gmail = google.gmail({ version: "v1", auth });
+
+      // ✅ Strip prefix
+      const gmailId = req.params.id.replace(/^gmail-/, "");
+
+      const gmailMsg = await gmail.users.messages.get({
+        userId: "me",
+        id: gmailId,
+      });
+
+      const bodyData = gmailMsg.data.payload.parts
+        ? gmailMsg.data.payload.parts.map(part => part.body.data).join("")
+        : gmailMsg.data.payload.body.data;
+
+      const body = Buffer.from(bodyData, "base64").toString("utf-8");
+
+      email = {
+        gmailId,
+        sender: gmailMsg.data.payload.headers.find(h => h.name === "From").value,
+        email: gmailMsg.data.payload.headers.find(h => h.name === "To").value,
+        subject: gmailMsg.data.payload.headers.find(h => h.name === "Subject").value,
+        body,
+      };
+    }
 
     const summary = await callClaude(`Summarise this email:\n\n${email.body}`);
 
     const newEmail = await Email.create({
+      gmailId: email.gmailId,
       sender: email.sender,
       email: email.email,
       subject: `[Summary] ${email.subject}`,
@@ -212,12 +291,42 @@ router.post("/summarise/:id", async (req, res) => {
 
 router.post("/respond/:id", async (req, res) => {
   try {
-    const email = await Email.findByPk(req.params.id);
-    if (!email) return res.status(404).json({ error: "Email not found" });
+    let email = await Email.findByPk(req.params.id);
 
+    // 1️⃣ If not in DB, fetch from Gmail
+    if (!email) {
+      const gmail = google.gmail({ version: "v1", auth });
+
+      // ✅ Strip prefix
+      const gmailId = req.params.id.replace(/^gmail-/, "");
+
+      const gmailMsg = await gmail.users.messages.get({
+        userId: "me",
+        id: gmailId,
+      });
+
+      // Decode Gmail body (base64)
+      const bodyData = gmailMsg.data.payload.parts
+        ? gmailMsg.data.payload.parts.map(part => part.body.data).join("")
+        : gmailMsg.data.payload.body.data;
+
+      const body = Buffer.from(bodyData, "base64").toString("utf-8");
+
+      email = {
+        gmailId,
+        sender: gmailMsg.data.payload.headers.find(h => h.name === "From").value,
+        email: gmailMsg.data.payload.headers.find(h => h.name === "To").value,
+        subject: gmailMsg.data.payload.headers.find(h => h.name === "Subject").value,
+        body,
+      };
+    }
+
+    // 2️⃣ Ask Claude to generate response
     const responseText = await callClaude(`Write a professional response to this email:\n\n${email.body}`);
 
+    // 3️⃣ Save only in DB
     const newEmail = await Email.create({
+      gmailId: email.gmailId,
       sender: "Auto Response System",
       email: "no-reply@system.com",
       subject: `[Response to] ${email.subject}`,
@@ -232,8 +341,5 @@ router.post("/respond/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to generate response" });
   }
 });
-
-
-
 
 module.exports = router;
