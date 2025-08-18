@@ -1,4 +1,4 @@
-import { Box, TextField, Button, Typography, InputAdornment } from '@mui/material';
+import { Box, TextField, Button, Typography, InputAdornment, CircularProgress } from '@mui/material';
 import { Email, Key } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -10,32 +10,46 @@ import { useState } from 'react';
 function ForgotPassword() {
   const navigate = useNavigate();
   const [codeSent, setCodeSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
-    initialValues: {
-      email: '',
-      code: '',
-    },
+    initialValues: { email: '', code: '' },
     validationSchema: yup.object({
       email: yup.string().trim().email('Invalid email').required('Email is required'),
-      code: yup.string().when('codeSent', {
+      code: yup.string().when('$codeSent', {
         is: true,
-        then: yup.string().required('Verification code is required'),
-      }),
+        then: (s) => s.required('Verification code is required'),
+        otherwise: (s) => s.notRequired()
+      })
     }),
+    context: { codeSent },
+    validateOnBlur: true,
+    validateOnChange: false,
     onSubmit: async (values) => {
       try {
+        setLoading(true);
+        const email = values.email.trim().toLowerCase();
+
         if (!codeSent) {
-          await http.post('/user/forgot-password', { email: values.email });
-          toast.success('Verification code sent to your email');
+          await http.post('/user/forgot-password', { email });
+          toast.success('Verification code sent. Check your email.');
           setCodeSent(true);
         } else {
-          navigate('/reset-password', { state: { email: values.email, code: values.code } });
+          await http.post('/user/verify-reset-code', {
+            email,
+            code: values.code.trim()
+          });
+          toast.success('Code verified');
+          navigate('/reset-password', {
+            state: { email, code: values.code.trim() }
+          });
         }
       } catch (err) {
         toast.error(err?.response?.data?.message || 'Error occurred');
+      } finally {
+        setLoading(false);
       }
-    },
+    }
   });
 
   return (
@@ -52,9 +66,7 @@ function ForgotPassword() {
               value={formik.values.email} onChange={formik.handleChange}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
-              InputProps={{
-                startAdornment: <InputAdornment position="start"><Email /></InputAdornment>,
-              }}
+              InputProps={{ startAdornment: <InputAdornment position="start"><Email /></InputAdornment> }}
             />
 
             {codeSent && (
@@ -63,18 +75,39 @@ function ForgotPassword() {
                 value={formik.values.code} onChange={formik.handleChange}
                 error={formik.touched.code && Boolean(formik.errors.code)}
                 helperText={formik.touched.code && formik.errors.code}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start"><Key /></InputAdornment>,
-                }}
+                InputProps={{ startAdornment: <InputAdornment position="start"><Key /></InputAdornment> }}
               />
             )}
 
             <Button
-              fullWidth variant="contained" type="submit"
+              fullWidth variant="contained" type="submit" disabled={loading}
               sx={{ mt: 2, backgroundColor: 'black', color: 'white', py: 1.2 }}
             >
-              {codeSent ? 'Forgot password' : 'Send verification code'}
+              {loading
+                ? <CircularProgress size={22} sx={{ color: 'white' }} />
+                : (codeSent ? 'Verify code' : 'Send verification code')}
             </Button>
+
+            {codeSent && (
+              <Button
+                fullWidth variant="text" disabled={loading}
+                sx={{ mt: 1 }}
+                onClick={async () => {
+                  try {
+                    setLoading(true);
+                    const email = formik.values.email.trim().toLowerCase();
+                    await http.post('/user/forgot-password', { email });
+                    toast.success('Code re-sent');
+                  } catch (e) {
+                    toast.error(e?.response?.data?.message || 'Failed to resend code');
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                Resend code
+              </Button>
+            )}
           </form>
           <ToastContainer />
         </Box>

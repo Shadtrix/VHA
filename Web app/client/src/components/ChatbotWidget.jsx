@@ -9,7 +9,7 @@ export default function ChatbotWidget() {
   const [input, setInput] = useState("");
 
   const { messages, addMessage, clearMessages } = useContext(ChatbotContext);
-  const { user } = useContext(UserContext); // ✅ get user
+  const { user } = useContext(UserContext);
 
   const sendMessage = async () => {
     if (!input.trim()) return;

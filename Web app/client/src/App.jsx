@@ -3,43 +3,14 @@ import './App.css';
 import './components/chatbot.css';
 
 import * as React from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Menu,
-  MenuItem,
-  Box,
-  Container,
-  IconButton,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Avatar,
-  CssBaseline
-} from '@mui/material';
-import {
-  AccountCircle,
-  ArrowDropDown,
-  Menu as MenuIcon
-} from '@mui/icons-material';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  NavLink as RouterNavLink,
-  Link as RouterLink
-} from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Box, Container, IconButton, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Avatar, CssBaseline } from '@mui/material';
+import { AccountCircle, ArrowDropDown, Menu as MenuIcon } from '@mui/icons-material';
+import { BrowserRouter as Router, Routes, Route, NavLink as RouterNavLink, Link as RouterLink, useLocation } from 'react-router-dom';
 
 import { createTheme, ThemeProvider, alpha } from '@mui/material/styles';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
-
 
 import Home from './pages/Home';
 import Tutorials from './pages/Tutorials';
@@ -150,6 +121,9 @@ const NavBtn = ({ to, children }) => (
 
 function AppContent() {
   const { user, setUser } = React.useContext(UserContext);
+  const location = useLocation();
+  const isHome = location.pathname === '/' || location.pathname === '/home';
+
   const [servicesEl, setServicesEl] = React.useState(null);
   const [accountEl, setAccountEl] = React.useState(null);
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -168,7 +142,8 @@ function AppContent() {
     window.location.href = '/login';
   };
 
-  const initials = user?.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AC';
+  const initials =
+    user?.name?.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase() || 'AC';
 
   return (
     <>
@@ -200,8 +175,7 @@ function AppContent() {
                   >
                     Services
                   </Button>
-                  <Menu anchorEl={servicesEl} open={Boolean(servicesEl)} onClose={closeServices}
-                    slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
+                  <Menu anchorEl={servicesEl} open={Boolean(servicesEl)} onClose={closeServices} slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
                     <MenuItem onClick={closeServices} component={RouterLink} to="/mechanicalelectricalplumbing">
                       Mechanical, Electrical & Plumbing
                     </MenuItem>
@@ -230,7 +204,8 @@ function AppContent() {
                     user ? (
                       <Avatar
                         sx={{
-                          width: 28, height: 28,
+                          width: 28,
+                          height: 28,
                           bgcolor: alpha('#fff', 0.2),
                           color: 'common.white',
                           fontSize: 12,
@@ -254,13 +229,18 @@ function AppContent() {
                 >
                   {user ? user.name : 'Account'}
                 </Button>
-                <Menu anchorEl={accountEl} open={Boolean(accountEl)} onClose={closeAccount}
-                  slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
+                <Menu anchorEl={accountEl} open={Boolean(accountEl)} onClose={closeAccount} slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
                   {!user ? (
                     <>
-                      <MenuItem onClick={closeAccount} component={RouterLink} to="/register">Register</MenuItem>
-                      <MenuItem onClick={closeAccount} component={RouterLink} to="/login">Login</MenuItem>
-                      <MenuItem onClick={closeAccount} component={RouterLink} to="/admin/login">Admin Login</MenuItem>
+                      <MenuItem onClick={closeAccount} component={RouterLink} to="/register">
+                        Register
+                      </MenuItem>
+                      <MenuItem onClick={closeAccount} component={RouterLink} to="/login">
+                        Login
+                      </MenuItem>
+                      <MenuItem onClick={closeAccount} component={RouterLink} to="/admin/login">
+                        Admin Login
+                      </MenuItem>
                     </>
                   ) : (
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
@@ -268,12 +248,7 @@ function AppContent() {
                 </Menu>
 
                 {/* Mobile hamburger */}
-                <IconButton
-                  color="inherit"
-                  onClick={() => setDrawerOpen(true)}
-                  sx={{ display: { xs: 'inline-flex', md: 'none' } }}
-                  aria-label="Open menu"
-                >
+                <IconButton color="inherit" onClick={() => setDrawerOpen(true)} sx={{ display: { xs: 'inline-flex', md: 'none' } }} aria-label="Open menu">
                   <MenuIcon />
                 </IconButton>
               </Box>
@@ -297,7 +272,7 @@ function AppContent() {
             {[
               { to: '/home', label: 'Home' },
               { to: '/reviews', label: 'Reviews' }
-            ].map(item => (
+            ].map((item) => (
               <ListItem key={item.to} disablePadding onClick={() => setDrawerOpen(false)}>
                 <ListItemButton component={RouterLink} to={item.to}>
                   <ListItemText primary={item.label} />
@@ -354,7 +329,12 @@ function AppContent() {
               </>
             ) : (
               <ListItem disablePadding>
-                <ListItemButton onClick={() => { setDrawerOpen(false); handleLogout(); }}>
+                <ListItemButton
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    handleLogout();
+                  }}
+                >
                   <ListItemText primary="Logout" />
                 </ListItemButton>
               </ListItem>
@@ -363,14 +343,7 @@ function AppContent() {
         </Drawer>
 
         {/* MAIN */}
-        <Box
-          component="main"
-          sx={{
-            flex: 1,
-            pt: '84px', // taller to clear glass AppBar
-            pb: 5
-          }}
-        >
+        <Box component="main" sx={{ flex: 1, pt: '84px', pb: 5 }}>
           <Box
             sx={{
               background: `radial-gradient(1000px 500px at 10% -10%, ${alpha(theme.palette.secondary.main, 0.25)}, transparent 60%),
@@ -387,10 +360,19 @@ function AppContent() {
                 Engineering & fire safety services for modern facilities.
               </Typography>
 
-              <Carousel autoPlay infiniteLoop>
-                <div><img src="/backgroundimg.png" /><p className="legend">First slide</p></div>
-                <div><img src="/VHA.png" /><p className="legend">Second slide</p></div>
-              </Carousel>
+              {/* Show carousel on Home routes only */}
+              {isHome && (
+                <Carousel autoPlay infiniteLoop>
+                  <div>
+                    <img src="/backgroundimg.png" />
+                    <p className="legend">First slide</p>
+                  </div>
+                  <div>
+                    <img src="/VHA.png" />
+                    <p className="legend">Second slide</p>
+                  </div>
+                </Carousel>
+              )}
             </Container>
           </Box>
 
@@ -434,9 +416,15 @@ function AppContent() {
               © {new Date().getFullYear()} VHA Pte. Ltd. All rights reserved.
             </Typography>
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button component={RouterLink} to="/home" size="small" variant="outlined">Home</Button>
-              <Button component={RouterLink} to="/reviews" size="small" variant="outlined">Reviews</Button>
-              <Button component={RouterLink} to="/annualfirecertification" size="small" variant="outlined">AFC</Button>
+              <Button component={RouterLink} to="/home" size="small" variant="outlined">
+                Home
+              </Button>
+              <Button component={RouterLink} to="/reviews" size="small" variant="outlined">
+                Reviews
+              </Button>
+              <Button component={RouterLink} to="/annualfirecertification" size="small" variant="outlined">
+                AFC
+              </Button>
             </Box>
           </Container>
         </Box>

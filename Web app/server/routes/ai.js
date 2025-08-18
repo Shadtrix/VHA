@@ -46,7 +46,7 @@ Respond ONLY with one word: "admin" or "user". Do not explain anything.
   try {
     const role = await callClaude(prompt);
     const cleanedRole = role.trim().toLowerCase();
-    const finalRole = cleanedRole === 'admin' ? 'admin' : 'user'; // fallback to 'user'
+    const finalRole = cleanedRole === 'admin' ? 'admin' : 'user'; 
     res.json({ role: finalRole });
   } catch (err) {
     console.error("❌ Claude error during role prompt:", err);

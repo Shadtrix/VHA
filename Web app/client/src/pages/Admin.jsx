@@ -244,11 +244,6 @@ function Admin() {
           </>
         );
 
-
-      case 'Reports':
-        return <Typography variant="h5">Reports</Typography>;
-      case 'Settings':
-        return <Typography variant="h5">Settings</Typography>;
       case 'Inbox':
         return <AdminInbox />;
       case 'Constructive Reviews':
@@ -522,7 +517,7 @@ function Admin() {
   return (
     <Box sx={{ p: 4 }}>
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        {['Dashboard', 'Users', 'Reports', 'Settings', 'Inbox', 'Email Filters', 'Constructive Reviews'].map(section => (
+        {['Dashboard', 'Users', 'Inbox', 'Email Filters', 'Constructive Reviews'].map(section => (
           <Button key={section}
             variant={activeSection === section ? 'contained' : 'outlined'}
             onClick={() => setActiveSection(section)}>
