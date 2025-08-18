@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import "../themes/chatbot.css"; 
 
+const API = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8080").replace(/\/$/, "");
+
 export default function Chatbot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -14,9 +16,7 @@ export default function Chatbot() {
     setInput("");
 
     try {
-      const res = await axios.post("http://localhost:3001/api/chatbot", {
-        message: input
-      });
+      const res = await axios.post(`${API}/api/chatbot`, { message: userMessage.text });
       const botReply = { from: "bot", text: res.data.reply };
       setMessages((prev) => [...prev, botReply]);
     } catch (err) {
@@ -40,6 +40,7 @@ export default function Chatbot() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask VHA anything..."
+          onKeyDown={(e) => e.key === "Enter" ? sendMessage() : null}
         />
         <button onClick={sendMessage}>Send</button>
       </div>

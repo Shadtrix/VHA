@@ -1,18 +1,31 @@
 const { BedrockRuntimeClient, InvokeModelCommand } = require("@aws-sdk/client-bedrock-runtime");
-
 const client = new BedrockRuntimeClient({ region: "ap-southeast-1" });
+const callClaudeChatbot = async (prompt, contextText = "", pageTitle = "", pageUrl = "") => {
+  const hasContext = Boolean(contextText && contextText.trim().length > 0);
 
-const callClaudeChatbot = async (prompt) => {
+  const body = {
+    anthropic_version: "bedrock-2023-05-31",
+    messages: [{ role: "user", content: prompt }],
+    max_tokens: 512,
+    temperature: hasContext ? 0.1 : 0.7
+  };
+
+  if (hasContext) {
+    body.system = `
+You are "Vincent AI" for VHA.
+Answer using ONLY the provided context excerpt from ${pageTitle || "the page"} at ${pageUrl || "the site"}.
+If the answer isn't in the context, say you don't know.
+
+Context:
+${contextText}
+    `.trim();
+  }
+
   const command = new InvokeModelCommand({
     modelId: "arn:aws:bedrock:ap-southeast-1:588922096295:inference-profile/apac.anthropic.claude-3-sonnet-20240229-v1:0",
     contentType: "application/json",
     accept: "application/json",
-    body: JSON.stringify({
-      anthropic_version: "bedrock-2023-05-31",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 1024,
-      temperature: 0.7
-    }),
+    body: JSON.stringify(body),
   });
 
   const response = await client.send(command);
