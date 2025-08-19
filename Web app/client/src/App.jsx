@@ -31,6 +31,7 @@ import EmailContent from './pages/EmailContent';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
+import ContactUs from './pages/ContactUs';
 
 import ChatbotWidget from './components/ChatbotWidget';
 import UserContext from './contexts/UserContext';
@@ -243,6 +244,8 @@ function AppContent() {
                       Registered Inspector Services
                     </MenuItem>
                   </Menu>
+                  <NavBtn to="/contact">Contact Us</NavBtn>
+
 
                   {user?.role === 'admin' && <NavBtn to="/admin">Admin</NavBtn>}
                 </Box>
@@ -435,6 +438,8 @@ function AppContent() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/rating" element={<Rating />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/contact" element={<ContactUs />} />
+
             </Routes>
           </Container>
         </Box>
