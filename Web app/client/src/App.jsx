@@ -413,41 +413,6 @@ function AppContent() {
 
 
         <Box component="main" sx={{ flex: 1, pt: '84px', pb: 5 }}>
-          <Container sx={{ pt: 2 }}>
-            {getBreadcrumbs(location.pathname)}
-          </Container>
-          <Box
-            sx={{
-              background: `radial-gradient(1000px 500px at 10% -10%, ${alpha(theme.palette.secondary.main, 0.25)}, transparent 60%),
-                 radial-gradient(1000px 500px at 90% -10%, ${alpha(theme.palette.primary.main, 0.25)}, transparent 60%)`,
-              py: { xs: 4, md: 6 },
-              mb: 2
-            }}
-          >
-            <Container>
-              <Typography variant="h4" fontWeight={800} color="text.primary">
-                Build safely. Certify confidently.
-              </Typography>
-              <Typography mt={1} color="text.secondary">
-                Engineering & fire safety services for modern facilities.
-              </Typography>
-
-
-              {isHome && (
-                <Carousel autoPlay infiniteLoop>
-                  <div>
-                    <img src="/backgroundimg.png" />
-                    <p className="legend">First slide</p>
-                  </div>
-                  <div>
-                    <img src="/VHA.png" />
-                    <p className="legend">Second slide</p>
-                  </div>
-                </Carousel>
-              )}
-            </Container>
-          </Box>
-
           <Container>
             <Routes>
               <Route path="/" element={<Home />} />

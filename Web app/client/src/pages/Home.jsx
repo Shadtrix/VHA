@@ -37,18 +37,28 @@ function Home() {
           overflow: 'hidden',
         }}
       >
+
         <Container
           maxWidth="lg"
           disableGutters
           sx={{ position: 'relative', zIndex: 1, px: { xs: 2, sm: 3 } }}
         >
-          <Typography variant="h3" fontWeight={800} gutterBottom>
+          <Typography
+            variant="h3"
+            fontWeight={800}
+            gutterBottom
+            sx={{ color: 'white' }}
+          >
             Engineering safety & compliance, done right.
           </Typography>
 
-          <Typography
-            variant="h6"
-            sx={{ opacity: 0.95, maxWidth: 900, mx: 'auto', mb: 3 }}
+          <Typography variant="h6" sx={{
+            opacity: 0.95,
+            maxWidth: 900,
+            mx: 'auto',
+            mb: 3,
+            color: 'white'
+          }}
           >
             VHA delivers Fire Safety, MEP Engineering, and Annual Fire Certification services
             with precision, speed, and audit-ready documentation.
@@ -75,7 +85,7 @@ function Home() {
               color="inherit"
               component={Link}
               to="/firesafetyengineering"
-              sx={{ borderColor: 'rgba(255,255,255,0.4)' }}
+              sx={{ borderColor: 'rgba(255,255,255,0.4)', color: 'white' }}
             >
               Learn more
             </Button>
@@ -83,6 +93,22 @@ function Home() {
         </Container>
       </Box>
 
+      <Container>
+        <Box sx={{ textAlign: 'center', py: 6, mb: 4 }}>
+          <Typography variant="h4" fontWeight={800} color="text.primary">
+          </Typography>
+        </Box>
+        <Typography variant="h4" fontWeight={800} color="text.primary">
+          Build safely. Certify confidently.
+        </Typography>
+        <Typography mt={1} color="text.secondary">
+          VHA Consultants Pte. Ltd./Vincent, Han and Associates is a professional engineering services provider based in Singapore, providing MEP Consultancy Service,  M&E Engineering Project Management,  Fire Safety Engineering, Registered Inspector Inspection, Fire Certificate Inspection and Qualified Persons services in Singapore and the Asia-Pacific region. The company had attained both ISO 9001 and ISO 14001 certifications . <br></br><br></br>
+
+          The company have corporatized and name VHA Consultants Pte. Ltd. in 2012<br></br><br></br>
+
+          The company draws on the expertise of its founder and associates to serve the clients and to provide value added design, quality performance and timely completion of the developments/projects.
+        </Typography>
+      </Container>
 
       <Container sx={{ py: 6 }}>
         <Grid container spacing={3} alignItems="stretch">
