@@ -42,6 +42,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    parentEmailId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'emails',
+        key: 'id'
+      }
+    },
     category_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -53,7 +61,12 @@ module.exports = (sequelize, DataTypes) => {
     last_classified_at: {
       type: DataTypes.DATE,
       allowNull: true
-    }
+    },
+    source: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "db", // default: created internally
+    },
   }, {
     tableName: "emails",
     timestamps: false
