@@ -8,6 +8,6 @@ margin-right: 16px;
 .hero-slide {
   width: 100%;
   display: block;
-  aspect-ratio: 16 / 6; /* adjust height as you like (e.g., 16/7 or 21/9) */
+  aspect-ratio: 16 / 6;
   object-fit: cover;
 }

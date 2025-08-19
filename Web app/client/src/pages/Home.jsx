@@ -83,7 +83,7 @@ function Home() {
         </Container>
       </Box>
 
-      {/* ===== Trust / Stats ===== */}
+
       <Container sx={{ py: 6 }}>
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12} md={4}>
@@ -121,7 +121,6 @@ function Home() {
 
       <Divider />
 
-      {/* ===== Services Overview ===== */}
       <Container sx={{ py: 6 }}>
         <Typography variant="h4" fontWeight={700} textAlign="center" gutterBottom>
           Our Services
@@ -182,7 +181,6 @@ function Home() {
 
       <Divider />
 
-      {/* ===== CTA / Contact ===== */}
       <Container sx={{ py: 6 }}>
         <Grid container spacing={3} alignItems="center">
           <Grid item xs={12} md={8}>

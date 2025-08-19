@@ -105,7 +105,6 @@ router.get('/by-category', async (req, res) => {
       }]
     });
 
-    // Map email_id to { email, categoryIds }
     const emailMap = new Map();
 
     results.forEach(result => {
