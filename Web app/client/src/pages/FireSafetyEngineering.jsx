@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./carousel.css";
 import axios from "axios";
+import Rating from "@mui/material/Rating";
 
 const FireSafetyEngineering = () => {
     const [reviews, setReviews] = useState([]);
@@ -14,7 +15,7 @@ const FireSafetyEngineering = () => {
                 const res = await axios.get("http://localhost:3001/api/reviews");
 
                 const allFiveStar = res.data.filter(
-                    (review) => review.service === "MEP Engineering" && review.rating === 5 &&
+                    (review) => review.service === "Fire Safety Engineering" && review.rating === 5 &&
                         review.featured
                 );
 
@@ -77,7 +78,8 @@ const FireSafetyEngineering = () => {
                     the performance-based approach, the prescriptive approach or a combination of both.
                 </p>
             </section>
-
+                <br></br>
+                <br></br>
             <section>
                 <h2 className="text-2xl font-semibold mt-6 mb-3">FSE Services Include</h2>
                 <ul className="list-disc list-inside space-y-1">
@@ -102,55 +104,137 @@ const FireSafetyEngineering = () => {
                 </ul>
             </section>
 
+
+            <br></br>
+            <br></br>
+
             <section>
-                <h2 className="text-2xl font-semibold mt-6 mb-3">Selected Projects</h2>
-
                 <h3 className="text-xl font-semibold mt-4">Commercial</h3>
-                <ul className="list-disc list-inside">
-                    <li>Gardens by the Bay</li>
-                    <li>Jurong Point</li>
-                    <li>City Square Mall</li>
-                    <li>Star Vista</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold mt-4">Infrastructural</h3>
-                <ul className="list-disc list-inside">
-                    <li>Kim Chuan Depot</li>
-                    <li>GalBatu Depot</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold mt-4">Industrial</h3>
-                <ul className="list-disc list-inside">
-                    <li>Harvest @ Woodlands</li>
-                    <li>IKEA</li>
-                    <li>CWT's Warehouses</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold mt-4">Institutional</h3>
-                <ul className="list-disc list-inside">
-                    <li>Singapore Expo</li>
-                    <li>Singapore Air-Show</li>
-                    <li>Sport Hub</li>
-                    <li>Changi Airport T1</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold mt-4">Residential</h3>
-                <ul className="list-disc list-inside">
-                    <li>Garden Vista</li>
-                    <li>One Shenton</li>
-                    <li>Marina One</li>
-                </ul>
-
-                <h3 className="text-xl font-semibold mt-4">Special Projects</h3>
-                <ul className="list-disc list-inside">
-                    <li>SMU-X</li>
-                    <li>BCAA</li>
-                    <li>Eunoia Junior College</li>
-                </ul>
-
-                <p className="italic text-sm mt-2">Photo taken from Beca FER Report</p>
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 2fr",
+                    gap: "24px",
+                    alignItems: "start",
+                    marginBottom: "2rem"
+                }}>
+                    <ul className="list-disc list-inside">
+                        <li>Gardens by the Bay</li>
+                        <li>Jurong Point</li>
+                        <li>City Square Mall</li>
+                        <li>Star Vista</li>
+                    </ul>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                        <img src="gardens1.png" alt="Gardens by the Bay" style={{ width: "48%", borderRadius: 8 }} />
+                        <img src="gardens2.png" alt="City Square Mall" style={{ width: "48%", borderRadius: 8 }} />
+                    </div>
+                </div>
             </section>
-        </div>
+
+            <section>
+                <h3 className="text-xl font-semibold mt-4">Infrastructural</h3>
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 2fr",
+                    gap: "24px",
+                    alignItems: "start",
+                    marginBottom: "2rem"
+                }}>
+                    <ul className="list-disc list-inside">
+                        <li>Kim Chuan Depot</li>
+                        <li>GalBatu Depot</li>
+                    </ul>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                        <img src="inf1.png" alt="Kim Chuan Depot" style={{ width: "48%", borderRadius: 8 }} />
+                        <img src="inf2.png" alt="GalBatu Depot" style={{ width: "48%", borderRadius: 8 }} />
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 className="text-xl font-semibold mt-4">Industrial</h3>
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 2fr",
+                    gap: "24px",
+                    alignItems: "start",
+                    marginBottom: "2rem"
+                }}>
+                    <ul className="list-disc list-inside">
+                        <li>Harvest @ Woodlands</li>
+                        <li>IKEA</li>
+                        <li>CWT's Warehouses</li>
+                    </ul>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                        <img src="ind1.png" alt="Harvest @ Woodlands" style={{ width: "48%", borderRadius: 8 }} />
+                        <img src="ind2.png" alt="IKEA" style={{ width: "48%", borderRadius: 8 }} />
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 className="text-xl font-semibold mt-4">Institutional</h3>
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 2fr",
+                    gap: "24px",
+                    alignItems: "start",
+                    marginBottom: "2rem"
+                }}>
+                    <ul className="list-disc list-inside">
+                        <li>Singapore Expo</li>
+                        <li>Singapore Air-Show</li>
+                        <li>Sport Hub</li>
+                        <li>Changi Airport T1</li>
+                    </ul>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                        <img src="inst1.png" alt="Singapore Expo" style={{ width: "48%", borderRadius: 8 }} />
+                        <img src="inst2.png" alt="Changi Airport T1" style={{ width: "48%", borderRadius: 8 }} />
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 className="text-xl font-semibold mt-4">Residential</h3>
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 2fr",
+                    gap: "24px",
+                    alignItems: "start",
+                    marginBottom: "2rem"
+                }}>
+                    <ul className="list-disc list-inside">
+                        <li>Garden Vista</li>
+                        <li>One Shenton</li>
+                        <li>Marina One</li>
+                    </ul>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                        <img src="res1.png" alt="Garden Vista" style={{ width: "48%", borderRadius: 8 }} />
+                        <img src="res2.png" alt="Marina One" style={{ width: "48%", borderRadius: 8 }} />
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 className="text-xl font-semibold mt-4">Special Projects</h3>
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 2fr",
+                    gap: "24px",
+                    alignItems: "start",
+                    marginBottom: "2rem"
+                }}>
+                    <ul className="list-disc list-inside">
+                        <li>SMU-X</li>
+                        <li>BCAA</li>
+                        <li>Eunoia Junior College</li>
+                    </ul>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+                        <img src="spec1.png" alt="SMU-X" style={{ width: "48%", borderRadius: 8 }} />
+                        <img src="spec2.png" alt="Eunoia Junior College" style={{ width: "48%", borderRadius: 8 }} />
+                    </div>
+                </div>
+            </section>
+        </div >
     );
 }
 

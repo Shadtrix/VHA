@@ -3,7 +3,7 @@ import './App.css';
 import './components/chatbot.css';
 
 import * as React from 'react';
-import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Box, Container, IconButton, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Avatar, CssBaseline } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Box, Container, IconButton, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Avatar, CssBaseline, Breadcrumbs, Link } from '@mui/material';
 import { AccountCircle, ArrowDropDown, Menu as MenuIcon } from '@mui/icons-material';
 import { BrowserRouter as Router, Routes, Route, NavLink as RouterNavLink, Link as RouterLink, useLocation } from 'react-router-dom';
 
@@ -92,6 +92,7 @@ function ElevateAppBar({ children }) {
   });
 }
 
+
 /* ----------------------- Reusable styled NavLink btn -------------------- */
 const NavBtn = ({ to, children }) => (
   <Button
@@ -153,6 +154,50 @@ function AppContent() {
     return /^https?:\/\//i.test(url) ? url : API_BASE + url; // turn /uploads/... into absolute URL
   };
   const avatarSrc = user?.avatarUrl ? resolveAvatar(user.avatarUrl) : null;
+
+    function getBreadcrumbs(pathname) {
+    if (pathname === "/annualfirecertification") {
+      return (
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2, color: "black" }}>
+          <Link underline="hover" color="inherit" component={RouterLink} to="/services">
+            Services
+          </Link>
+          <Typography sx={{ color: "primary.main", fontWeight: 700 }}>Annual Fire Certification</Typography>
+        </Breadcrumbs>
+      );
+    }
+    if (pathname === "/registeredinspectorservices") {
+      return (
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2, color: "black" }}>
+          <Link underline="hover" color="inherit" component={RouterLink} to="/services">
+            Services
+          </Link>
+          <Typography sx={{ color: "primary.main", fontWeight: 700 }}>Registered Inspector Services</Typography>
+        </Breadcrumbs>
+      );
+    }
+    if (pathname === "/mechanicalelectricalplumbing") {
+      return (
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2, color: "black" }}>
+          <Link underline="hover" color="inherit" component={RouterLink} to="/services">
+            Services
+          </Link>
+          <Typography sx={{ color: "primary.main", fontWeight: 700 }}>MEP Engineering</Typography>
+        </Breadcrumbs>
+      );
+    }
+    if (pathname === "/firesafetyengineering") {
+      return (
+        <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2, color: "black" }}>
+          <Link underline="hover" color="inherit" component={RouterLink} to="/services">
+            Services
+          </Link>
+          <Typography sx={{ color: "primary.main", fontWeight: 700 }}>Fire Safety Engineering</Typography>
+        </Breadcrumbs>
+      );
+    }
+    return null;
+  }
 
   return (
     <>
@@ -366,8 +411,11 @@ function AppContent() {
           </List>
         </Drawer>
 
-        
+
         <Box component="main" sx={{ flex: 1, pt: '84px', pb: 5 }}>
+          <Container sx={{ pt: 2 }}>
+            {getBreadcrumbs(location.pathname)}
+          </Container>
           <Box
             sx={{
               background: `radial-gradient(1000px 500px at 10% -10%, ${alpha(theme.palette.secondary.main, 0.25)}, transparent 60%),
@@ -384,7 +432,7 @@ function AppContent() {
                 Engineering & fire safety services for modern facilities.
               </Typography>
 
-              
+
               {isHome && (
                 <Carousel autoPlay infiniteLoop>
                   <div>
@@ -426,7 +474,7 @@ function AppContent() {
           </Container>
         </Box>
 
-        
+
         <Box
           component="footer"
           sx={{

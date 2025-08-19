@@ -4,6 +4,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./carousel.css";
 import axios from "axios";
+import Rating from "@mui/material/Rating";
+
 
 const RegisteredInspectorServices = () => {
     const [reviews, setReviews] = useState([]);
@@ -14,7 +16,7 @@ const RegisteredInspectorServices = () => {
                 const res = await axios.get("http://localhost:3001/api/reviews");
 
                 const allFiveStar = res.data.filter(
-                    (review) => review.service === "MEP Engineering" && review.rating === 5 &&
+                    (review) => review.service === "Registered Inspector Services" && review.rating === 5 &&
                         review.featured
                 );
 
@@ -109,19 +111,36 @@ const RegisteredInspectorServices = () => {
                 </p>
             </section>
 
+            {/* Selected Projects Section with Grid Layout */}
             <section>
                 <h2 className="text-2xl font-semibold mt-6 mb-3">Selected Projects</h2>
-                <ul className="list-disc list-inside space-y-1">
+                <ul className="list-disc list-inside space-y-1" style={{ fontWeight: 600, color: "#228B22" }}>
                     <li>MRT Thomson Line</li>
-                    <li>Marina Bay Sands</li>
+                    <li>Marina Bay Sand</li>
                     <li>Sport Hub</li>
                     <li>Outram Community Hospital</li>
                     <li>Paya Lebar Quarter</li>
                     <li>Changi Airport Terminal 1</li>
                     <li>Mandai Zoo/Bird Park</li>
                 </ul>
-            </section>
-        </div>
+                <div
+                    style={{
+                        display: "flex",
+                        gap: "32px",
+                        flexWrap: "nowrap",
+                        justifyContent: "flex-start",
+                        alignItems: "flex-start",
+                        marginTop: "2rem",
+                        overflowX: "auto"
+                    }}
+                >
+                    <img src="TEline.png" alt="MRT Thomson Line" style={{ width: "32%", minWidth: 260, borderRadius: 8 }} />
+                    <img src="BirdPark.png" alt="Mandai Zoo/Bird Park" style={{ width: "32%", minWidth: 260, borderRadius: 8 }} />
+                    <img src="Sportshub.png" alt="Sport Hub" style={{ width: "32%", minWidth: 260, borderRadius: 8 }} />
+                    {/* Add or adjust images as needed */}
+                </div>
+            </section >
+        </div >
     );
 };
 

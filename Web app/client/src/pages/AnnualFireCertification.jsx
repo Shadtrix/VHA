@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./carousel.css";
 import axios from "axios";
+import Rating from "@mui/material/Rating";
 
 const AnnualFireCertification = () => {
   const [reviews, setReviews] = useState([]);
@@ -14,7 +15,7 @@ const AnnualFireCertification = () => {
         const res = await axios.get("http://localhost:3001/api/reviews");
 
         const allFiveStar = res.data.filter(
-          (review) => review.service === "MEP Engineering" && review.rating === 5 &&
+          (review) => review.service === "Annual Fire Certification" && review.rating === 5 &&
             review.featured
         );
 
@@ -40,6 +41,7 @@ const AnnualFireCertification = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <div>
       <section className="customer-reviews-section">
         <h2 className="customer-reviews-title">Customer Reviews</h2>
         {reviews.length > 0 ? (
@@ -62,8 +64,8 @@ const AnnualFireCertification = () => {
         ) : (
           <p>No 5-star reviews available yet.</p>
         )}
-
       </section>
+      </div>
       <section>
         <h1 className="text-3xl font-bold mb-4">Annual Fire Certification</h1>
         <p>
@@ -71,6 +73,8 @@ const AnnualFireCertification = () => {
 
           We are able to provide the annual inspection and testing service for all buildings and facilities, such as  an engineered timber building, a fully automated mechanized car park, that require to obtain FC.
 
+          <br></br>
+          <br></br>
 
           We are currently provide the FC inspection and tastings service for Marina Bay Sands, that include the hotel towers, exhibition centers, shopping centers, museum, carparking, F&B and the casinos...
 
