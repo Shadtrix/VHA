@@ -415,7 +415,7 @@ function AppContent() {
         </Drawer>
 
 
-        <Box component="main" sx={{ flex: 1, pt: '84px', pb: 5 }}>
+        <Box component="main" sx={{ flex: 1, pt: '64px', pb: 5 }}>
           <Container>
             <Routes>
               <Route path="/" element={<Home />} />
