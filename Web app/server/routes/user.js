@@ -13,7 +13,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: Number(process.env.SMTP_PORT) || 465,
@@ -70,6 +69,119 @@ const upload = multer({
   limits: { fileSize: 2 * 1024 * 1024 } 
 });
 
+// ...existing requires and setup above...
+
+// ---------------- existing /me endpoints ----------------
+
+router.get('/me', validateToken, async (req, res) => {
+  const u = await User.findByPk(req.user.id);
+  if (!u) return res.status(404).json({ message: 'User not found' });
+  res.json({ id: u.id, email: u.email, name: u.name, role: u.role, avatarUrl: u.avatarUrl || null });
+});
+
+router.put('/me', validateToken, async (req, res) => {
+  const { name } = req.body || {};
+  const schema = yup.object({
+    name: yup.string().trim().min(3).max(50).required()
+      .matches(/^[a-zA-Z '-,.]+$/, "Name only allows letters, spaces and characters: ' - , .")
+  });
+  try {
+    await schema.validate({ name }, { abortEarly: false });
+    const u = await User.findByPk(req.user.id);
+    if (!u) return res.status(404).json({ message: 'User not found' });
+    u.name = name.trim();
+    await u.save();
+    res.json({ message: 'Profile updated' });
+  } catch (e) {
+    res.status(400).json({ message: 'Invalid name', errors: e.errors });
+  }
+});
+
+router.post('/me/avatar', validateToken, upload.single('avatar'), async (req, res) => {
+  const u = await User.findByPk(req.user.id);
+  if (!u) return res.status(404).json({ message: 'User not found' });
+  const urlPath = `/uploads/avatars/${req.file.filename}`;
+  u.avatarUrl = urlPath;
+  await u.save();
+  res.json({ message: 'Avatar updated', avatarUrl: urlPath });
+});
+
+router.post('/change-password', validateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body || {};
+  if (!newPassword || !/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/.test(newPassword.trim())) {
+    return res.status(400).json({ message: 'Password must be at least 8 chars and include letters & numbers.' });
+  }
+  const u = await User.findByPk(req.user.id);
+  if (!u) return res.status(404).json({ message: 'User not found' });
+  if ((currentPassword || '').trim() !== u.password) {
+    return res.status(400).json({ message: 'Current password is incorrect.' });
+  }
+  u.password = newPassword.trim();
+  await u.save();
+  res.json({ message: 'Password changed' });
+});
+
+router.delete('/me', validateToken, async (req, res) => {
+  try {
+    await User.destroy({ where: { id: req.user.id } });
+    return res.json({ message: 'Account deleted' });
+  } catch (e) {
+    console.error('Delete my account failed:', e);
+    return res.status(500).json({ message: 'Failed to delete account' });
+  }
+});
+
+router.put('/:id', validateToken, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) return res.status(400).json({ message: 'Invalid id' });
+
+  const { name, email, password, role } = req.body;
+  try {
+    await User.update({ name, email, password, role }, { where: { id } });
+    res.json({ message: 'User updated' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to update user' });
+  }
+});
+
+router.delete('/:id', validateToken, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) return res.status(400).json({ message: 'Invalid id' });
+
+  try {
+    await User.destroy({ where: { id } });
+    res.json({ message: 'User soft-deleted' });
+  } catch (err) {
+    console.error('Delete failed:', err);
+    res.status(500).json({ message: 'Failed to delete user', error: err.message });
+  }
+});
+
+router.post('/restore/:id', validateToken, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) return res.status(400).json({ message: 'Invalid id' });
+
+  try {
+    await User.restore({ where: { id } });
+    res.json({ message: 'User restored successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to restore user' });
+  }
+});
+
+router.delete('/hard/:id', validateToken, async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) return res.status(400).json({ message: 'Invalid id' });
+
+  try {
+    await User.destroy({ where: { id }, force: true });
+    res.json({ message: 'User hard-deleted permanently' });
+  } catch (err) {
+    console.error('Hard delete failed:', err);
+    res.status(500).json({ message: 'Hard delete failed', error: err.message });
+  }
+});
 
 router.post("/register", async (req, res) => {
   let data = req.body;
