@@ -16,14 +16,14 @@ function Profile() {
   const [pw, setPw] = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [saving, setSaving] = useState(false);
   const [changingPw, setChangingPw] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const inputRef = useRef(null);
 
-  
   const resolveAvatar = (urlPath) => {
     if (!urlPath) return undefined;
     if (/^https?:\/\//i.test(urlPath)) return urlPath;
-    return API_BASE + urlPath; 
+    return API_BASE + urlPath;
   };
 
   useEffect(() => {
@@ -44,7 +44,6 @@ function Profile() {
     setSaving(true);
     try {
       await http.put('/user/me', { name });
-      
       const { data } = await http.get('/user/me');
       setMe(data);
       const updated = { ...(user || {}), name: data.name, avatarUrl: data.avatarUrl || null };
@@ -58,11 +57,10 @@ function Profile() {
     }
   };
 
-  
   const onPickAvatar = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setAvatarFile(file); 
+    setAvatarFile(file);
     try {
       const fd = new FormData();
       fd.append('avatar', file);
@@ -70,7 +68,6 @@ function Profile() {
       const newUrl = r.data.avatarUrl || '';
       setAvatarUrl(newUrl);
 
-      
       const { data } = await http.get('/user/me');
       const updated = { ...(user || {}), name: data.name, avatarUrl: data.avatarUrl || newUrl || null };
       localStorage.setItem('user', JSON.stringify(updated));
@@ -81,7 +78,6 @@ function Profile() {
       console.error(err);
       alert(err?.response?.data?.message || 'Avatar upload failed');
     } finally {
-      
       if (inputRef.current) inputRef.current.value = '';
     }
   };
@@ -100,6 +96,25 @@ function Profile() {
       alert(e?.response?.data?.message || 'Failed to change password');
     } finally {
       setChangingPw(false);
+    }
+  };
+
+  const onDeleteAccount = async () => {
+    const ok = window.confirm('This will delete your account (soft delete) and log you out. Continue?');
+    if (!ok) return;
+
+    setDeleting(true);
+    try {
+      await http.delete('/user/me');   
+      alert('Your account has been deleted.');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      setUser(null);
+      window.location.href = '/register';
+    } catch (e) {
+      alert(e?.response?.data?.message || 'Failed to delete account');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -175,6 +190,22 @@ function Profile() {
               </Button>
             </Box>
           </Stack>
+        </CardContent>
+      </Card>
+
+      {/* Danger zone */}
+      <Divider sx={{ my: 4 }} />
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h6" color="error" fontWeight={800} gutterBottom>
+            Danger zone
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Delete your account (soft delete). You can ask an admin to restore it later.
+          </Typography>
+          <Button variant="contained" color="error" onClick={onDeleteAccount} disabled={deleting}>
+            {deleting ? 'Deleting…' : 'Delete account'}
+          </Button>
         </CardContent>
       </Card>
 
