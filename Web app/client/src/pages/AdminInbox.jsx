@@ -93,7 +93,7 @@ function AdminInbox() {
     try {
       const res = await axios.post('http://localhost:3001/api/email/create', formData);
       setInboxData(prev => [...prev, res.data]);
-      setFormData({ sender: '', email: '', subject: '', body: '', date: '' });
+      setFormData({ sender: '', email: '', subject: '', body: '', date: new Date().toISOString().split("T")[0] });
     } catch (err) {
       console.error("Error creating email:", err);
       setFormError('Failed to create email.');
