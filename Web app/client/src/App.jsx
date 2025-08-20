@@ -465,8 +465,8 @@ function AppContent() {
               <Button component={RouterLink} to="/reviews" size="small" variant="outlined">
                 Reviews
               </Button>
-              <Button component={RouterLink} to="/annualfirecertification" size="small" variant="outlined">
-                AFC
+              <Button component={RouterLink} to="/contact" size="small" variant="outlined">
+                Contact Us
               </Button>
             </Box>
           </Container>
