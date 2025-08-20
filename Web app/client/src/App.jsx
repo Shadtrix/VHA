@@ -230,7 +230,7 @@ function AppContent() {
                   >
                     Services
                   </Button>
-                  <Menu anchorEl={servicesEl} open={Boolean(servicesEl)} onClose={closeServices} slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
+                  <Menu anchorEl={servicesEl} open={Boolean(servicesEl)} onClose={closeServices} slotProps={{ paper: { sx: { mt: 1, borderRadius: 0.5 } } } } disableScrollLock>
                     <MenuItem onClick={closeServices} component={RouterLink} to="/mechanicalelectricalplumbing">
                       Mechanical, Electrical & Plumbing
                     </MenuItem>
@@ -287,7 +287,7 @@ function AppContent() {
                 >
                   {user ? user.name : 'Account'}
                 </Button>
-                <Menu anchorEl={accountEl} open={Boolean(accountEl)} onClose={closeAccount} slotProps={{ paper: { sx: { mt: 1, borderRadius: 2 } } }}>
+                <Menu anchorEl={accountEl} open={Boolean(accountEl)} onClose={closeAccount} slotProps={{ paper: { sx: { mt: 1, borderRadius: 0.5 } } }} disableScrollLock>
                   {!user ? (
                     <>
                       <MenuItem onClick={closeAccount} component={RouterLink} to="/register">
